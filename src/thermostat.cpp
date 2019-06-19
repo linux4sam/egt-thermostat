@@ -44,7 +44,7 @@ public:
         m_title->set_margin(10);
         add(m_title);
 
-        auto m_radial1 = make_shared<Radial>(*this, Rect(Point(w() / 2 - 350 / 2,
+        auto m_radial1 = make_shared<Radial>(*this, Rect(Point(width() / 2 - 350 / 2,
                                              -350),
                                              Size(350, 350)),
                                              0, 100);
@@ -174,7 +174,7 @@ int main(int argc, const char** argv)
         auto color2 = widget.color(Palette::ColorId::button_bg).color();
         auto color3 = widget.color(Palette::ColorId::button_fg).color();
 
-        float radius = widget.w() / 2 - handle_radius - linew;
+        float radius = widget.width() / 2 - handle_radius - linew;
         float angle1 = detail::to_radians<float>(-90, 0);
         float angle2 = detail::to_radians<float>(-90, v);
 

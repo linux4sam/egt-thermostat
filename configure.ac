@@ -12,6 +12,10 @@ AM_INIT_AUTOMAKE([1.10 foreign subdir-objects])
 # Enable quiet compiles on automake 1.11.
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+# Initialize libtool
+LT_PREREQ([2.2])
+LT_INIT([win32-dll])
+
 CXXFLAGS="$CXXFLAGS -std=c++11 -pedantic -g"
 CFLAGS="$CFLAGS -g"
 
@@ -19,6 +23,8 @@ AX_PTHREAD([LIBS="$PTHREAD_LIBS $LIBS"
             CFLAGS="$CFLAGS $PTHREAD_CFLAGS"], AC_MSG_ERROR(Can not find pthreads.  This is required.))
 
 AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_CPP
 AC_CHECK_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_UINT32_T
@@ -89,5 +95,13 @@ PKG_CHECK_MODULES(LIBEGT, [libegt], [], [
    AC_MSG_ERROR(libegt not found.  This is required.)
 ])
 
-AC_CONFIG_FILES([Makefile])
+AC_CHECK_HEADER([sensors/sensors.h], [have_sensors=yes], [have_sensors=no])
+if test "x${have_sensors}" = xyes; then
+   CXXFLAGS="-DLUA_USE_READLINE ${CXXFLAGS}"
+   LDFLAGS="-lsensors ${LDFLAGS}"
+   AC_DEFINE(HAVE_SENSORS, 1, [Have sensors support])
+fi
+AM_CONDITIONAL([HAVE_SENSORS], [test "x${have_sensors}" = xyes])
+
+AC_CONFIG_FILES([Makefile external/Makefile])
 AC_OUTPUT

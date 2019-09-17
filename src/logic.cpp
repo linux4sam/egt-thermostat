@@ -13,15 +13,7 @@ using namespace egt;
 using namespace std;
 
 Logic::Logic()
-    : m_timer(std::chrono::seconds(1))
-{
-    // process() every second
-    m_timer.on_timeout([this]()
-    {
-        process();
-    });
-    m_timer.start();
-}
+{}
 
 std::string Logic::status_str(status s)
 {

@@ -10,6 +10,7 @@
 #include <string>
 #include <memory>
 #include "logic.h"
+#include <vector>
 
 struct Settings : public egt::detail::noncopyable
 {
@@ -28,5 +29,7 @@ struct Settings : public egt::detail::noncopyable
 };
 
 Settings& settings();
+
+void get_timezones(std::vector<std::string>& timezones);
 
 #endif

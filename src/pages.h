@@ -51,6 +51,13 @@ struct MainPage : public ThermostatPage
     std::shared_ptr<egt::VerticalBoxSizer> m_layout;
 };
 
+struct SchedulePage : public ThermostatPage
+{
+    SchedulePage(ThermostatWindow& window, Logic& logic);
+
+    virtual bool leave() override;
+};
+
 struct ModePage : public ThermostatPage
 {
     ModePage(ThermostatWindow& window, Logic& logic);
@@ -96,6 +103,7 @@ struct HomeContentPage : public ThermostatPage
     virtual bool leave() override;
 
     std::shared_ptr<egt::ToggleBox> m_degrees;
+    std::unique_ptr<egt::ButtonGroup> m_button_group;
 };
 
 struct SensorsPage : public ThermostatPage

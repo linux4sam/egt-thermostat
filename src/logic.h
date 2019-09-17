@@ -72,8 +72,6 @@ protected:
 
     fanmode m_fan_mode{fanmode::automatic};
     bool m_fan_status{false};
-
-    egt::PeriodicTimer m_timer;
 };
 
 #endif

@@ -52,6 +52,7 @@ int main(int argc, const char** argv)
     detail::add_search_path("./images");
 
     global_theme().palette().set(Palette::ColorId::label_text, Palette::white);
+    global_theme().palette().set(Palette::ColorId::label_bg, Color(Palette::cyan, 30), Palette::GroupId::active);
     global_theme().palette().set(Palette::ColorId::button_text, Palette::white);
     global_theme().palette().set(Palette::ColorId::border, Palette::cyan);
     global_theme().palette().set(Palette::ColorId::border, Palette::cyan, Palette::GroupId::active);

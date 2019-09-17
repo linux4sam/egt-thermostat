@@ -83,21 +83,25 @@ ModePage::ModePage(ThermostatWindow& window, Logic& logic)
 
     auto mode_auto = make_shared<ImageButton>(Image("auto.png"), "Automatic");
     mode_auto->set_name("auto");
+    mode_auto->set_checked(settings().get("mode") == "auto");
     selectable_btn_setup(mode_auto);
     sizer->add(mode_auto);
 
     auto mode_heating = make_shared<ImageButton>(Image("heating.png"), "Heating");
     mode_heating->set_name("heat");
+    mode_heating->set_checked(settings().get("mode") == "heat");
     selectable_btn_setup(mode_heating);
     sizer->add(mode_heating);
 
     auto mode_cooling = make_shared<ImageButton>(Image("cooling.png"), "Cooling");
     mode_cooling->set_name("cool");
+    mode_cooling->set_checked(settings().get("mode") == "cool");
     selectable_btn_setup(mode_cooling);
     sizer->add(mode_cooling);
 
     auto mode_off = make_shared<ImageButton>(Image("off.png"), "Off");
     mode_off->set_name("off");
+    mode_off->set_checked(settings().get("mode") == "off");
     selectable_btn_setup(mode_off);
     sizer->add(mode_off);
 
@@ -347,7 +351,7 @@ MenuPage::MenuPage(ThermostatWindow& window, Logic& logic)
     grid->add(time);
     time->on_click([this](Event&)
     {
-        //m_window.push_page("time");
+        m_window.push_page("schedule");
     });
 
     auto sleep_mode = make_setup_button<ImageButton>(Image("sleep.png"), "Sleep Mode");
@@ -457,6 +461,74 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     m_degrees->set_color(Palette::ColorId::button_text, Palette::white, Palette::GroupId::disabled);
     m_degrees->set_checked(settings().get("degrees") == "c");
     form->add_option("Display degrees", m_degrees);
+
+    auto m_time_format = make_shared<ToggleBox>();
+    m_time_format->set_boxtype(Theme::boxtype::border_rounded);
+    m_time_format->set_border(2);
+    m_time_format->set_toggle_text("12 Hour", "24 Hour");
+    m_time_format->set_enable_disable(false);
+    m_time_format->set_color(Palette::ColorId::button_bg, Color(Palette::cyan, 55));
+    m_time_format->set_color(Palette::ColorId::button_text, Palette::white);
+    m_time_format->set_color(Palette::ColorId::button_text, Palette::white, Palette::GroupId::disabled);
+    m_time_format->set_checked(settings().get("time_format") == "24");
+    form->add_option("Time format", m_time_format);
+
+    m_button_group = egt::make_unique<ButtonGroup>(true, true);
+    auto frame = make_shared<Frame>();
+    frame->set_border(4);
+    frame->set_boxtype(Theme::boxtype::border_bottom);
+    auto sizer = make_shared<HorizontalBoxSizer>();
+    frame->add(expand(sizer));
+    auto btn1 = make_shared<CheckButton>("Fahrenheit");
+    btn1->set_checked(true);
+    btn1->set_boxtype(Theme::boxtype::blank);
+    btn1->set_color(Palette::ColorId::button_bg, Palette::transparent);
+    btn1->set_color(Palette::ColorId::button_text, Palette::white);
+    btn1->set_color(Palette::ColorId::button_bg, Color(Palette::cyan, 55), Palette::GroupId::checked);
+    auto btn2 = make_shared<CheckButton>("Celsius");
+    btn2->set_boxtype(Theme::boxtype::blank);
+    btn2->set_color(Palette::ColorId::button_bg, Palette::transparent);
+    btn2->set_color(Palette::ColorId::button_text, Palette::white);
+    btn2->set_color(Palette::ColorId::button_bg, Color(Palette::cyan, 55), Palette::GroupId::checked);
+    auto btn3 = make_shared<CheckButton>("None");
+    btn3->set_boxtype(Theme::boxtype::blank);
+    btn3->set_color(Palette::ColorId::button_bg, Palette::transparent);
+    btn3->set_color(Palette::ColorId::button_text, Palette::white);
+    btn3->set_color(Palette::ColorId::button_bg, Color(Palette::cyan, 55), Palette::GroupId::checked);
+    sizer->add(expand(btn1));
+    sizer->add(expand(btn2));
+    sizer->add(expand(btn3));
+
+    m_button_group->add(*btn1);
+    m_button_group->add(*btn2);
+    m_button_group->add(*btn3);
+
+    form->add_option("Display degrees", frame);
+
+#if 0
+    auto m_timezone = std::make_shared<ListBox>(Rect(0, 0, 100, 100));
+    //m_timezone->set_color(Palette::ColorId::bg, Palette::transparent);
+    //m_timezone->hide();
+    std::vector<std::string> timezones;
+    get_timezones(timezones);
+    cout << timezones.size() << " timezones" << endl;
+    for (auto& t : timezones)
+    {
+        auto s = std::make_shared<StringItem>(t);
+        s->set_color(Palette::ColorId::label_text, Palette::black);
+        m_timezone->add_item(s);
+    }
+    //m_timezone->show();
+    form->add_option("Timezone", m_timezone);
+#endif
+
+    std::vector<std::string> timezones;
+    get_timezones(timezones);
+
+    auto timezone = std::make_shared<Scrollwheel>(timezones);
+    timezone->set_orient(orientation::horizontal);
+    timezone->set_image(Image("wheel_down.png"),  Image("wheel_up.png"));
+    form->add_option("Timezone", timezone);
 }
 
 bool HomeContentPage::leave()
@@ -786,4 +858,97 @@ void MainPage::apply_logic_change(Logic::status status)
         break;
     }
     }
+}
+
+SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
+    : ThermostatPage(window, logic)
+{
+    auto layout = make_shared<VerticalBoxSizer>(justification::start);
+    add(expand(layout));
+
+    auto title = make_shared<Frame>();
+    title->set_boxtype(Theme::boxtype::blank);
+    title->set_color(Palette::ColorId::bg, Color::css("#3b4248"));
+    title->set_height(50);
+    layout->add(expand_horizontal(title));
+
+    auto title_menu = make_shared<Label>("Schedule");
+    title_menu->set_font(Font(title_font_size));
+    // TODO: clipping on end of text if we just center here
+    title->add(egt::expand_horizontal(egt::center(title_menu)));
+
+    auto title_back = make_shared<ImageButton>(Image("back.png"));
+    title_back->set_boxtype(Theme::boxtype::none);
+    title->add(left(egt::center(title_back)));
+
+    title_back->on_click([this](Event&)
+    {
+        m_window.pop_page();
+    });
+
+
+    auto form = make_shared<Form>();
+    form->set_height(50);
+    form->set_boxtype(Theme::boxtype::fill);
+    form->set_color(Palette::ColorId::bg, Palette::gray);
+    layout->add(expand_horizontal(form));
+
+    auto enabled = make_shared<ToggleBox>();
+    // TODO: this should probably be default to none
+    enabled->set_boxtype(Theme::boxtype::border_rounded);
+    enabled->set_border(2);
+    enabled->set_margin(2);
+    enabled->set_toggle_text("Off", "On");
+    enabled->set_enable_disable(true);
+    enabled->set_color(Palette::ColorId::button_bg, Color(Palette::cyan, 55));
+    enabled->set_color(Palette::ColorId::button_text, Palette::white);
+    enabled->set_color(Palette::ColorId::button_text, Palette::white, Palette::GroupId::disabled);
+    form->set_name_align(alignmask::center);
+    form->add_option("Thermostat Schedule", enabled);
+
+
+    auto grid = make_shared<StaticGrid>(Tuple(3, 4));
+    layout->add(expand(grid));
+
+    vector<string> times;
+    for (auto m = 0; m < 24 * 60; m += 15)
+    {
+        ostringstream ss;
+        if (((m / 60) % 12) < 1)
+            ss << "12";
+        else
+            ss << std::to_string((m / 60) % 12);
+        ss << std::string(":");
+        ss << std::setfill('0') << std::setw(2) << std::to_string(m % 60);
+        if (m < (12 * 60))
+            ss << std::string(" AM");
+        else
+            ss << std::string(" PM");
+        times.push_back(ss.str());
+    }
+
+    vector<string> temps;
+    for (auto m = 0; m < 100; m++)
+        temps.push_back(std::to_string(m) + "°");
+
+    vector<string> names = { "Wake", "Leave", "Return", "Sleep"};
+
+    for (auto& name : names)
+    {
+        grid->add(expand(make_shared<ImageLabel>(Image("setting.png"), name)));
+        auto time1 = std::make_shared<Scrollwheel>(times);
+        time1->set_orient(orientation::horizontal);
+        time1->set_image(Image("wheel_down.png"),  Image("wheel_up.png"));
+        grid->add(expand(time1));
+
+        auto temp1 = std::make_shared<Scrollwheel>(temps);
+        temp1->set_orient(orientation::horizontal);
+        temp1->set_image(Image("wheel_down.png"),  Image("wheel_up.png"));
+        grid->add(expand(temp1));
+    }
+}
+
+bool SchedulePage::leave()
+{
+    return true;
 }

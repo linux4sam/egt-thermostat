@@ -105,11 +105,11 @@ ModePage::ModePage(ThermostatWindow& window, Logic& logic)
     selectable_btn_setup(mode_off);
     sizer->add(mode_off);
 
-    m_button_group = egt::make_unique<ButtonGroup>(true, true);
-    m_button_group->add(*mode_auto);
-    m_button_group->add(*mode_heating);
-    m_button_group->add(*mode_cooling);
-    m_button_group->add(*mode_off);
+    m_button_group = detail::make_unique<ButtonGroup>(true, true);
+    m_button_group->add(mode_auto);
+    m_button_group->add(mode_heating);
+    m_button_group->add(mode_cooling);
+    m_button_group->add(mode_off);
 }
 
 bool ModePage::leave()
@@ -173,9 +173,9 @@ FanPage::FanPage(ThermostatWindow& window, Logic& logic)
     mode_auto->set_checked(settings().get("fan") == "on");
     sizer->add(mode_off);
 
-    m_button_group = egt::make_unique<ButtonGroup>(true, true);
-    m_button_group->add(*mode_auto);
-    m_button_group->add(*mode_off);
+    m_button_group = detail::make_unique<ButtonGroup>(true, true);
+    m_button_group->add(mode_auto);
+    m_button_group->add(mode_off);
 }
 
 bool FanPage::leave()
@@ -343,7 +343,7 @@ MenuPage::MenuPage(ThermostatWindow& window, Logic& logic)
         m_window.pop_page();
     });
 
-    auto grid = make_shared<StaticGrid>(Tuple(4, 2));
+    auto grid = make_shared<StaticGrid>(std::make_tuple(4, 2));
     grid->set_border(40);
     layout->add(expand(grid));
 
@@ -473,7 +473,7 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     m_time_format->set_checked(settings().get("time_format") == "24");
     form->add_option("Time format", m_time_format);
 
-    m_button_group = egt::make_unique<ButtonGroup>(true, true);
+    m_button_group = detail::make_unique<ButtonGroup>(true, true);
     auto frame = make_shared<Frame>();
     frame->set_border(4);
     frame->set_boxtype(Theme::boxtype::border_bottom);
@@ -499,9 +499,9 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     sizer->add(expand(btn2));
     sizer->add(expand(btn3));
 
-    m_button_group->add(*btn1);
-    m_button_group->add(*btn2);
-    m_button_group->add(*btn3);
+    m_button_group->add(btn1);
+    m_button_group->add(btn2);
+    m_button_group->add(btn3);
 
     form->add_option("Display degrees", frame);
 
@@ -572,7 +572,7 @@ SensorsPage::SensorsPage(ThermostatWindow& window, Logic& logic)
 
     layout->add(make_shared<Label>("Select the sensor to use for internal temperature"));
 
-    m_checkbox_group = egt::make_unique<ButtonGroup>(true, true);
+    m_checkbox_group = detail::make_unique<ButtonGroup>(true, true);
 
     const auto sensors = enumerate_temp_sensors();
     for (const auto& sensor : sensors)
@@ -584,7 +584,7 @@ SensorsPage::SensorsPage(ThermostatWindow& window, Logic& logic)
         checkbox->set_margin(5);
         checkbox->set_name(sensor);
         layout->add(checkbox);
-        m_checkbox_group->add(*checkbox);
+        m_checkbox_group->add(checkbox);
     }
 }
 
@@ -906,8 +906,7 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
     form->set_name_align(alignmask::center);
     form->add_option("Thermostat Schedule", enabled);
 
-
-    auto grid = make_shared<StaticGrid>(Tuple(3, 4));
+    auto grid = make_shared<StaticGrid>(std::make_tuple(3, 4));
     layout->add(expand(grid));
 
     vector<string> times;

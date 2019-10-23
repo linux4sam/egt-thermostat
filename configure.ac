@@ -95,12 +95,16 @@ PKG_CHECK_MODULES(LIBEGT, [libegt], [], [
    AC_MSG_ERROR(libegt not found.  This is required.)
 ])
 
-AC_CHECK_HEADER([sensors/sensors.h], [have_sensors=yes], [have_sensors=no])
-if test "x${have_sensors}" = xyes; then
-   CXXFLAGS="-DLUA_USE_READLINE ${CXXFLAGS}"
-   LDFLAGS="-lsensors ${LDFLAGS}"
-   AC_DEFINE(HAVE_SENSORS, 1, [Have sensors support])
-fi
+AC_ARG_WITH([sensors],
+    AS_HELP_STRING([--without-sensors], [Ignore presence of sensors and disable it]))
+AS_IF([test "x$with_sensors" != "xno"],[
+   AC_CHECK_HEADER([sensors/sensors.h], [have_sensors=yes], [have_sensors=no])
+   if test "x${have_sensors}" = xyes; then
+      CXXFLAGS="-DLUA_USE_READLINE ${CXXFLAGS}"
+      LDFLAGS="-lsensors ${LDFLAGS}"
+      AC_DEFINE(HAVE_SENSORS, 1, [Have sensors support])
+   fi
+])
 AM_CONDITIONAL([HAVE_SENSORS], [test "x${have_sensors}" = xyes])
 
 AC_CONFIG_FILES([Makefile external/Makefile])

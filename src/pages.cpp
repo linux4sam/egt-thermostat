@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include "pages.h"
-#include "window.h"
-#include "settings.h"
 #include "sensors.h"
+#include "settings.h"
+#include "window.h"
+#include <iomanip>
 
 using namespace egt;
 using namespace egt::experimental;

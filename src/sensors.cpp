@@ -3,12 +3,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include "sensors.h"
-#include <iostream>
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include "sensors.h"
+#include <iostream>
 
 #ifdef HAVE_SENSORS
 #include <sensors/sensors.h>
@@ -36,12 +36,15 @@ std::vector<std::string> enumerate_temp_sensors()
 
     std::vector<std::string> res;
 
+    // add fake sensor
+    res.push_back("fake");
+
 #ifdef HAVE_SENSORS
     sensors_chip_name const* cn;
     int c = 0;
     while ((cn = sensors_get_detected_chips(0, &c)) != 0)
     {
-        std::cout << "Chip: " << cn->prefix << "/" << cn->path << std::endl;
+        std::cout << "Chip: " << cn->prefix << cn->path << std::endl;
 
         sensors_feature const* feat;
         int f = 0;
@@ -52,7 +55,7 @@ std::vector<std::string> enumerate_temp_sensors()
             switch (feat->type)
             {
             case SENSORS_FEATURE_TEMP:
-                res.push_back(std::string(cn->prefix) + "/" + std::string(cn->path) + "/" + std::to_string(f));
+                res.push_back(std::string(cn->prefix) + std::string(cn->path) + "/" + std::to_string(f));
                 break;
             default:
                 break;
@@ -92,6 +95,12 @@ double get_temp_sensor(const std::string& name)
 
     double res = 0.;
 
+    if (name == "fake")
+    {
+        res = 22.;
+        return res;
+    }
+
 #ifdef HAVE_SENSORS
     sensors_chip_name const* cn;
     int c = 0;
@@ -104,7 +113,7 @@ double get_temp_sensor(const std::string& name)
             switch (feat->type)
             {
             case SENSORS_FEATURE_TEMP:
-                if (name == std::string(cn->prefix) + "/" + std::string(cn->path) + "/" + std::to_string(f))
+                if (name == std::string(cn->prefix) + std::string(cn->path) + "/" + std::to_string(f))
                 {
                     // @todo probably a good idea to check
                     // SENSORS_SUBFEATURE_TEMP_FAULT before reading the value as good

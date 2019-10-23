@@ -9,9 +9,6 @@
 #include <egt/ui>
 #include <string>
 
-/**
- *
- */
 class Logic : public egt::detail::Object
 {
 public:

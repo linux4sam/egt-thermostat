@@ -26,6 +26,7 @@ ThermostatWindow::ThermostatWindow()
     m_pages["screenbrightness"] = make_shared<ScreenBrightnessPage>(*this, m_logic);
     m_pages["sensors"] = make_shared<SensorsPage>(*this, m_logic);
     m_pages["schedule"] = make_shared<SchedulePage>(*this, m_logic);
+    m_pages["about"] = make_shared<AboutPage>(*this, m_logic);
 
     for (auto& i : m_pages)
         notebook->add(i.second);

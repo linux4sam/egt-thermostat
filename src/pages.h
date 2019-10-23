@@ -30,17 +30,21 @@ struct IdlePage : public ThermostatPage
 {
     IdlePage(ThermostatWindow& window, Logic& logic);
 
+    virtual void enter() override;
+
     void apply_logic_change(Logic::status status);
 
     std::shared_ptr<egt::Label> m_temp;
     std::shared_ptr<egt::Label> m_status;
+    std::shared_ptr<egt::ImageLabel> m_otemp;
 };
 
 struct MainPage : public ThermostatPage
 {
     MainPage(ThermostatWindow& window, Logic& logic);
 
-    virtual void enter();
+    virtual void enter() override;
+    virtual bool leave() override;
 
     void apply_logic_change(Logic::status status);
 
@@ -49,6 +53,8 @@ struct MainPage : public ThermostatPage
     std::shared_ptr<egt::ImageButton> m_mode;
     std::shared_ptr<egt::ImageButton> m_fan;
     std::shared_ptr<egt::VerticalBoxSizer> m_layout;
+    std::shared_ptr<egt::CameraWindow> m_camera;
+    std::shared_ptr<egt::ImageLabel> m_otemp;
 };
 
 struct SchedulePage : public ThermostatPage
@@ -103,7 +109,8 @@ struct HomeContentPage : public ThermostatPage
     virtual bool leave() override;
 
     std::shared_ptr<egt::ToggleBox> m_degrees;
-    std::unique_ptr<egt::ButtonGroup> m_button_group;
+    std::shared_ptr<egt::ToggleBox> m_usebackground;
+    std::shared_ptr<egt::ToggleBox> m_showoutside;
 };
 
 struct SensorsPage : public ThermostatPage
@@ -113,6 +120,11 @@ struct SensorsPage : public ThermostatPage
     std::unique_ptr<egt::ButtonGroup> m_checkbox_group;
 
     virtual bool leave() override;
+};
+
+struct AboutPage : public ThermostatPage
+{
+    AboutPage(ThermostatWindow& window, Logic& logic);
 };
 
 #endif

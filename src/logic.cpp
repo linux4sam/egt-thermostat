@@ -32,8 +32,6 @@ std::string Logic::status_str(status s)
 
 void Logic::change_target(float value)
 {
-    value = std::round(value);
-
     if (egt::detail::change_if_diff<>(m_target, value))
     {
         process();
@@ -43,8 +41,6 @@ void Logic::change_target(float value)
 
 void Logic::change_current(float value)
 {
-    value = std::round(value);
-
     if (egt::detail::change_if_diff<>(m_current, value))
     {
         process();
@@ -110,29 +106,6 @@ void Logic::set_fan_mode(fanmode m)
     }
 }
 
-#if 0
-struct Output
-{
-    static const auto COMPRESSOR_SAFETY_DELTA = std::chrono::seconds(60);
-
-    // TODO: hardware output
-
-    // we can't do anything if not outside of safety delta
-    if (m_last_compressor_time.time_since_epoch().count())
-    {
-        auto now = std::chrono::steady_clock::now();
-        auto diff = now - m_last_compressor_time;
-        if (diff <= COMPRESSOR_SAFETY_DELTA)
-            return;
-    }
-
-    m_last_compressor_time = std::chrono::steady_clock::now();
-
-    std::chrono::time_point<std::chrono::steady_clock> m_last_compressor_time{};
-
-};
-#endif
-
 void Logic::set_status(status s, bool fan)
 {
     auto f1 = egt::detail::change_if_diff<>(m_fan_status, fan);
@@ -140,8 +113,7 @@ void Logic::set_status(status s, bool fan)
     {
         cout << "fan: " << m_fan_status << endl;
 
-        //static Output output("fan");
-        //output.go(m_status);
+        // set fan output to m_fan_status
     }
 
     auto s1 = egt::detail::change_if_diff<>(m_status, s);
@@ -149,8 +121,7 @@ void Logic::set_status(status s, bool fan)
     {
         cout << "status: " << status_str(m_status) << endl;
 
-        //static Output output("ac/heat");
-        //output.go(m_status);
+        // set cool/heat output to m_status
     }
 
     if (f1 || s1)

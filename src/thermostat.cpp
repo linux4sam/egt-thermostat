@@ -3,29 +3,18 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <egt/detail/imagecache.h>
-#include <egt/ui>
-#include <iostream>
-
 #include "logic.h"
 #include "pages.h"
-#include "window.h"
 #include "sensors.h"
 #include "settings.h"
+#include "window.h"
+#include <egt/detail/imagecache.h>
+#include <egt/ui>
+#include <iomanip>
+#include <iostream>
 
 using namespace std;
 using namespace egt;
-
-/*
-static std::string current_time_and_date()
-{
-    auto now = std::chrono::system_clock::now();
-    auto in_time_t = std::chrono::system_clock::to_time_t(now);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&in_time_t), "%A, %B %e %r");
-    return ss.str();
-}
-*/
 
 static std::string current_time()
 {
@@ -61,9 +50,9 @@ int main(int argc, const char** argv)
 
     auto b = settings().get("normal_brightness");
     if (b.empty())
-        settings().set("normal_brightness", std::to_string(main_screen()->max_brightness()));
+        settings().set("normal_brightness", std::to_string(Application::instance().screen()->max_brightness()));
 
-    main_screen()->set_brightness(std::stoi(settings().get("normal_brightness")));
+    Application::instance().screen()->set_brightness(std::stoi(settings().get("normal_brightness")));
 
     ThermostatWindow win;
     win.show();
@@ -106,9 +95,9 @@ int main(int argc, const char** argv)
     screen_brightness_timer.on_timeout([&win]()
     {
         auto b = settings().get("sleep_brightness",
-                                main_screen()->max_brightness() / 2);
+                                Application::instance().screen()->max_brightness() / 2);
 
-        main_screen()->set_brightness(b);
+        Application::instance().screen()->set_brightness(b);
     });
 
     // TODO: this needs to be use and be reset with setting
@@ -124,7 +113,7 @@ int main(int argc, const char** argv)
     Input::global_input().on_event([&idle_timer, &screen_brightness_timer](Event & event)
     {
         screen_brightness_timer.cancel();
-        main_screen()->set_brightness(std::stoi(settings().get("normal_brightness")));
+        Application::instance().screen()->set_brightness(std::stoi(settings().get("normal_brightness")));
         idle_timer.start();
     }, {eventid::raw_pointer_down,
         eventid::raw_pointer_up,

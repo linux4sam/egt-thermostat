@@ -481,10 +481,13 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     std::vector<std::string> timezones;
     get_timezones(timezones);
 
-    auto timezone = std::make_shared<Scrollwheel>(timezones);
-    timezone->set_orient(orientation::horizontal);
-    timezone->set_image(Image("wheel_down.png"),  Image("wheel_up.png"));
-    form->add_option("Timezone", timezone);
+    if (!timezones.empty())
+    {
+        auto timezone = std::make_shared<Scrollwheel>(timezones);
+        timezone->set_orient(orientation::horizontal);
+        timezone->set_image(Image("wheel_down.png"),  Image("wheel_up.png"));
+        form->add_option("Timezone", timezone);
+    }
 }
 
 bool HomeContentPage::leave()

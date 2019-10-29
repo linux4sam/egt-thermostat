@@ -138,17 +138,20 @@ static void get_timezones(std::vector<std::string>& timezones,
                           const std::string& dir,
                           const std::string& path)
 {
-    for (const auto& p : fs::directory_iterator(path))
+    if (fs::exists(path))
     {
-        if (fs::is_regular_file(p.path()))
+        for (const auto& p : fs::directory_iterator(path))
         {
-            std::string s = p.path().filename();
-            if (!dir.empty())
-                s = dir + std::string("/") + s;
-            timezones.push_back(s);
+            if (fs::is_regular_file(p.path()))
+            {
+                std::string s = p.path().filename();
+                if (!dir.empty())
+                    s = dir + std::string("/") + s;
+                timezones.push_back(s);
+            }
+            else if (fs::is_directory(p.path()))
+                get_timezones(timezones, dir + std::string("/") + p.path().filename().string(), p.path());
         }
-        else if (fs::is_directory(p.path()))
-            get_timezones(timezones, dir + std::string("/") + p.path().filename().string(), p.path());
     }
 }
 

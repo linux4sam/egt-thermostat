@@ -10,9 +10,11 @@ CUSTOM_CXXFLAGS = $(WARN_CFLAGS) \
 
 CUSTOM_LDADD = $(LIBEGT_LIBS) $(top_builddir)/external/libsqlite3.la
 
-bin_PROGRAMS = thermostat
+AM_CXXFLAGS = -DDATADIR=\"$(datadir)\"
 
-thermostat_SOURCES = src/thermostat.cpp \
+bin_PROGRAMS = egt-thermostat
+
+egt_thermostat_SOURCES = src/thermostat.cpp \
 src/logic.h \
 src/logic.cpp \
 src/pages.h \
@@ -23,8 +25,10 @@ src/settings.h \
 src/settings.cpp \
 src/sensors.h \
 src/sensors.cpp
-thermostat_CXXFLAGS = $(CUSTOM_CXXFLAGS) $(AM_CXXFLAGS)
-thermostat_LDADD = $(CUSTOM_LDADD) -ldl
-thermostatdir = $(prefix)/share/egt/samples/thermostat
-dist_thermostat_DATA = $(wildcard $(top_srcdir)/images/*.png)
-thermostat_LDFLAGS = $(AM_LDFLAGS)
+egt_thermostat_CXXFLAGS = $(CUSTOM_CXXFLAGS) $(AM_CXXFLAGS)
+egt_thermostat_LDADD = $(CUSTOM_LDADD) -ldl
+egt_thermostatdir = $(prefix)/share/egt/thermostat
+dist_egt_thermostat_DATA = $(wildcard $(top_srcdir)/images/*.png) \
+	$(wildcard $(top_srcdir)/*.png) \
+	$(wildcard $(top_srcdir)/egt-thermostat.xml)
+egt_thermostat_LDFLAGS = $(AM_LDFLAGS)

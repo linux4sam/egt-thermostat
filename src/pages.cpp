@@ -258,7 +258,7 @@ bool IdleSettingsPage::leave()
     settings().set("sleep_brightness", std::to_string(m_sleep_brightness->value()));
     settings().set("sleep_timeout", std::to_string(m_idle_timeout->value()));
 
-    m_window.m_idle_timer.change_duration(std::chrono::seconds(settings().get("sleep_timeout",20)));
+    m_window.m_idle_timer.change_duration(std::chrono::seconds(settings().get("sleep_timeout", 20)));
 
     return true;
 }
@@ -296,8 +296,8 @@ ScreenBrightnessPage::ScreenBrightnessPage(ThermostatWindow& window, Logic& logi
     sizer->add(make_shared<Label>("Screen brightness"));
 
     auto normal_brightness = std::make_shared<Slider>(3,
-                                                      Application::instance().screen()->max_brightness(),
-                                                      settings().get("normal_brightness", Application::instance().screen()->max_brightness()));
+                             Application::instance().screen()->max_brightness(),
+                             settings().get("normal_brightness", Application::instance().screen()->max_brightness()));
     normal_brightness->set_height(50);
     normal_brightness->set_align(alignmask::expand_horizontal);
     normal_brightness->slider_flags().set({Slider::flag::round_handle, Slider::flag::show_label});
@@ -824,7 +824,11 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     shrink_camera();
     add(m_camera);
 
-    m_camera->on_event([this](Event& event)
+    auto camera_button = make_shared<Button>();
+    camera_button->set_box(Rect(Point(m_menu->width() + 10, 10), m_camera->size() / 2));
+    add(camera_button);
+    camera_button->set_boxtype(Theme::boxtype::none);
+    camera_button->on_event([this](Event & event)
     {
         if (!m_camera_fullscreen)
         {
@@ -834,7 +838,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
         }
     }, {eventid::pointer_click});
 
-    m_camera->on_event([this](Event& event)
+    m_camera->on_event([this](Event & event)
     {
         cout << "camera error" << endl;
         m_camera->hide();
@@ -893,6 +897,7 @@ void MainPage::enter()
 
 bool MainPage::leave()
 {
+    shrink_camera();
     m_camera->stop();
     m_camera->hide();
     return true;

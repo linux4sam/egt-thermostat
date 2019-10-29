@@ -52,7 +52,7 @@ ThermostatWindow::ThermostatWindow()
         Application::instance().screen()->set_brightness(brightness);
     });
 
-    m_idle_timer.change_duration(std::chrono::seconds(settings().get("sleep_timeout",20)));
+    m_idle_timer.change_duration(std::chrono::seconds(settings().get("sleep_timeout", 20)));
     m_idle_timer.on_timeout([this]()
     {
         this->idle();

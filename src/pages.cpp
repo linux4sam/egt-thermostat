@@ -594,11 +594,6 @@ IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
     m_otemp->set_image_align(alignmask::center | alignmask::top);
     leftbox->add(egt::center(m_otemp));
 
-    auto m_wifi = make_shared<ImageLabel>(Image("@32px/wifi.png"));
-    m_wifi->set_align(alignmask::right | alignmask::top);
-    m_wifi->set_margin(10);
-    add(m_wifi);
-
     auto logo = std::make_shared<ImageButton>(Image("@128px/egt_logo_white.png"));
     logo->set_boxtype(Theme::boxtype::none);
     logo->set_align(alignmask::center | alignmask::bottom);

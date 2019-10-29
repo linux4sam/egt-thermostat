@@ -4,17 +4,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include "settings.h"
-#include <sqlite3pp.h>
 #include <map>
+#include <sqlite3pp.h>
 #include <string>
 
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
+static inline const char* db_path()
+{
+    auto install_path = DATADIR "/egt/thermostat/thermostat.db";
+    if (fs::is_regular_file(install_path))
+        return install_path;
+    return "thermostat.db";
+}
+
 struct Settings::settings_impl
 {
     std::map<std::string, std::string> cache;
-    sqlite3pp::database db{"thermostat.db"};
+    sqlite3pp::database db{db_path()};
     sqlite3pp::query config_qry{db,
                   "SELECT value FROM config WHERE key=:key LIMIT 1"};
     sqlite3pp::command config_cmd{db,

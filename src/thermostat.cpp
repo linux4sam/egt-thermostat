@@ -38,6 +38,7 @@ int main(int argc, const char** argv)
 {
     Application app(argc, argv);
 
+    detail::add_search_path(DATADIR "/egt/thermostat/");
     detail::add_search_path("./images");
 
     global_theme().palette().set(Palette::ColorId::label_text, Palette::white);

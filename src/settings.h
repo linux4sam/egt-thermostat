@@ -19,7 +19,9 @@ struct Settings : public egt::detail::noncopyable
     void set(const std::string& key, const std::string& value);
     std::string get(const std::string& key);
 
+    // this promotes bad practice - causes duplication of defaults at callers
     int get(const std::string& key, int default_value);
+    std::string get(const std::string& key, const std::string& default_value);
 
     void temp_log(float temp);
     void status_log(Logic::status status, bool fan);

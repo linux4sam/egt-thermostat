@@ -22,6 +22,8 @@ struct ThermostatPage : public egt::NotebookTab
 
     virtual ~ThermostatPage() = default;
 
+    virtual void shrink_camera() {}
+
     ThermostatWindow& m_window;
     Logic& m_logic;
 };
@@ -45,9 +47,11 @@ struct MainPage : public ThermostatPage
 
     virtual void enter() override;
     virtual bool leave() override;
+    virtual void shrink_camera() override;
 
     void apply_logic_change(Logic::status status);
 
+    std::shared_ptr<egt::ImageButton> m_menu;
     std::shared_ptr<egt::Label> m_temp;
     std::shared_ptr<egt::Label> m_status;
     std::shared_ptr<egt::ImageButton> m_mode;
@@ -55,6 +59,8 @@ struct MainPage : public ThermostatPage
     std::shared_ptr<egt::VerticalBoxSizer> m_layout;
     std::shared_ptr<egt::CameraWindow> m_camera;
     std::shared_ptr<egt::ImageLabel> m_otemp;
+
+    bool m_camera_fullscreen{true};
 };
 
 struct SchedulePage : public ThermostatPage

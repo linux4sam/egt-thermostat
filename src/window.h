@@ -33,6 +33,8 @@ public:
     std::map<std::string, std::shared_ptr<egt::NotebookTab>> m_pages;
     Logic m_logic;
     std::deque<std::string> m_queue;
+    egt::Timer m_screen_brightness_timer{std::chrono::seconds(5)};
+    egt::PeriodicTimer m_idle_timer;
 };
 
 #endif

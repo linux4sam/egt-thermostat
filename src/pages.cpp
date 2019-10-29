@@ -232,11 +232,10 @@ IdleSettingsPage::IdleSettingsPage(ThermostatWindow& window, Logic& logic)
     sizer->set_margin(50);
     layout->add(expand(sizer));
 
-    sizer->add(make_shared<Label>("Minutes idle before entering sleep mode"));
+    sizer->add(make_shared<Label>("Seconds idle before entering sleep mode"));
 
-    m_idle_timeout = std::make_shared<Slider>(0, 60,
-                     settings().get("sleep_timeout", 60));
-    // idle_timeout->set_margin(50); // BROKE
+    m_idle_timeout = std::make_shared<Slider>(10, 120,
+                     settings().get("sleep_timeout", 20));
     m_idle_timeout->set_height(50);
     m_idle_timeout->set_align(alignmask::expand_horizontal);
     m_idle_timeout->slider_flags().set({Slider::flag::round_handle, Slider::flag::show_label});
@@ -244,11 +243,10 @@ IdleSettingsPage::IdleSettingsPage(ThermostatWindow& window, Logic& logic)
 
     sizer->add(make_shared<Label>("Sleep screen brightness"));
 
-    m_sleep_brightness = std::make_shared<Slider>(0,
+    m_sleep_brightness = std::make_shared<Slider>(3,
                          Application::instance().screen()->max_brightness(),
-
                          settings().get("sleep_brightness",
-                                        Application::instance().screen()->max_brightness()));
+                                        Application::instance().screen()->max_brightness() / 2));
     m_sleep_brightness->set_height(50);
     m_sleep_brightness->set_align(alignmask::expand_horizontal);
     m_sleep_brightness->slider_flags().set({Slider::flag::round_handle, Slider::flag::show_label});
@@ -260,7 +258,7 @@ bool IdleSettingsPage::leave()
     settings().set("sleep_brightness", std::to_string(m_sleep_brightness->value()));
     settings().set("sleep_timeout", std::to_string(m_idle_timeout->value()));
 
-    // TODO: have to reset idle timeout timer!
+    m_window.m_idle_timer.change_duration(std::chrono::seconds(settings().get("sleep_timeout",20)));
 
     return true;
 }
@@ -291,16 +289,15 @@ ScreenBrightnessPage::ScreenBrightnessPage(ThermostatWindow& window, Logic& logi
         m_window.pop_page();
     });
 
-
     auto sizer = make_shared<VerticalBoxSizer>();
     sizer->set_margin(50);
     layout->add(expand(sizer));
 
     sizer->add(make_shared<Label>("Screen brightness"));
 
-    auto normal_brightness = std::make_shared<Slider>(0,
-                             Application::instance().screen()->max_brightness(),
-                             std::stoi(settings().get("normal_brightness")));
+    auto normal_brightness = std::make_shared<Slider>(3,
+                                                      Application::instance().screen()->max_brightness(),
+                                                      settings().get("normal_brightness", Application::instance().screen()->max_brightness()));
     normal_brightness->set_height(50);
     normal_brightness->set_align(alignmask::expand_horizontal);
     normal_brightness->slider_flags().set({Slider::flag::round_handle, Slider::flag::show_label});
@@ -445,7 +442,7 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     m_showoutside->set_color(Palette::ColorId::button_bg, Color(Palette::cyan, 55));
     m_showoutside->set_color(Palette::ColorId::button_text, Palette::white);
     m_showoutside->set_color(Palette::ColorId::button_text, Palette::white, Palette::GroupId::disabled);
-    m_showoutside->set_checked(settings().get("outside") == "on");
+    m_showoutside->set_checked(settings().get("outside", "on") == "on");
     form->add_option("Outside temp", m_showoutside);
 
     m_degrees = make_shared<ToggleBox>();
@@ -467,7 +464,7 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     m_usebackground->set_color(Palette::ColorId::button_bg, Color(Palette::cyan, 55));
     m_usebackground->set_color(Palette::ColorId::button_text, Palette::white);
     m_usebackground->set_color(Palette::ColorId::button_text, Palette::white, Palette::GroupId::disabled);
-    m_usebackground->set_checked(settings().get("background") == "on");
+    m_usebackground->set_checked(settings().get("background", "on") == "on");
     form->add_option("Background Image", m_usebackground);
 
     auto m_time_format = make_shared<ToggleBox>();
@@ -627,7 +624,7 @@ IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
 
 void IdlePage::enter()
 {
-    if (settings().get("outside") == "on")
+    if (settings().get("outside", "on") == "on")
     {
         m_otemp->show();
     }
@@ -664,12 +661,12 @@ void IdlePage::apply_logic_change(Logic::status status)
 MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     : ThermostatPage(window, logic)
 {
-    auto menu = make_shared<ImageButton>(Image("menu.png"));
-    menu->set_boxtype(Theme::boxtype::none);
-    menu->set_padding(0);
-    menu->move(Point(0, 20));
-    add(menu);
-    menu->on_click([this](Event&)
+    m_menu = make_shared<ImageButton>(Image("menu.png"));
+    m_menu->set_boxtype(Theme::boxtype::none);
+    m_menu->set_padding(0);
+    m_menu->move(Point(0, 20));
+    add(m_menu);
+    m_menu->on_click([this](Event&)
     {
         m_window.push_page("menu");
     });
@@ -747,7 +744,6 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
             case eventid::pointer_click:
                 if (settings().get("degrees") == "f")
                 {
-                    cout << f2c(1.) << endl;
                     m_logic.change_target(m_logic.target() + f2c(1.));
                 }
                 else
@@ -827,26 +823,24 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     });
 
     m_camera = make_shared<CameraWindow>(Size(320, 240));
-    m_camera->move(Point(menu->width() + 10, 10));
-    m_camera->set_scale(.5, .5);
+    shrink_camera();
     add(m_camera);
 
-    m_camera->on_event([this, menu](Event&)
+    m_camera->on_event([this](Event& event)
     {
-        static bool scaled = true;
-        if (scaled)
+        if (!m_camera_fullscreen)
         {
             m_camera->move(Point(0, 0));
             m_camera->set_scale(2.5, 2.5);
-            scaled = false;
-        }
-        else
-        {
-            m_camera->move(Point(menu->width() + 10, 10));
-            m_camera->set_scale(.5, .5);
-            scaled = true;
+            m_camera_fullscreen = true;
         }
     }, {eventid::pointer_click});
+
+    m_camera->on_event([this](Event& event)
+    {
+        cout << "camera error" << endl;
+        m_camera->hide();
+    }, {eventid::event2});
 }
 
 static string& capitalize(string& s)
@@ -856,9 +850,19 @@ static string& capitalize(string& s)
     return s;
 }
 
+void MainPage::shrink_camera()
+{
+    if (m_camera_fullscreen)
+    {
+        m_camera->move(Point(m_menu->width() + 10, 10));
+        m_camera->set_scale(.5, .5);
+        m_camera_fullscreen = false;
+    }
+}
+
 void MainPage::enter()
 {
-    if (settings().get("background") == "on")
+    if (settings().get("background", "on") == "on")
     {
         m_window.set_background(Image("background.png"));
         set_boxtype(Theme::boxtype::none);
@@ -869,7 +873,7 @@ void MainPage::enter()
         set_boxtype(Theme::boxtype::fill);
     }
 
-    if (settings().get("outside") == "on")
+    if (settings().get("outside", "on") == "on")
     {
         m_otemp->show();
     }
@@ -885,8 +889,8 @@ void MainPage::enter()
     auto fan = settings().get("fan");
     m_fan->set_text(string("Fan ") + capitalize(fan));
 
-    m_camera->start();
-    m_camera->show();
+    if (m_camera->start())
+        m_camera->show();
 }
 
 bool MainPage::leave()

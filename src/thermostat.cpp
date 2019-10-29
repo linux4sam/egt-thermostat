@@ -90,36 +90,6 @@ int main(int argc, const char** argv)
     });
     time_timer.start();
 
-    // TODO: hard code?
-    Timer screen_brightness_timer(std::chrono::seconds(10));
-    screen_brightness_timer.on_timeout([&win]()
-    {
-        auto b = settings().get("sleep_brightness",
-                                Application::instance().screen()->max_brightness() / 2);
-
-        Application::instance().screen()->set_brightness(b);
-    });
-
-    // TODO: this needs to be use and be reset with setting
-    PeriodicTimer idle_timer(std::chrono::seconds(10));
-    idle_timer.on_timeout([&win, &screen_brightness_timer]()
-    {
-        win.idle();
-        screen_brightness_timer.start();
-    });
-    idle_timer.start();
-
-    // on any input, reset idle timer
-    Input::global_input().on_event([&idle_timer, &screen_brightness_timer](Event & event)
-    {
-        screen_brightness_timer.cancel();
-        Application::instance().screen()->set_brightness(std::stoi(settings().get("normal_brightness")));
-        idle_timer.start();
-    }, {eventid::raw_pointer_down,
-        eventid::raw_pointer_up,
-        eventid::raw_pointer_move
-       });
-
     // automatically select the first temp sensor if one is available
     if (settings().get("temp_sensor").empty())
     {

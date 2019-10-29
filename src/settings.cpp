@@ -83,6 +83,30 @@ int Settings::get(const std::string& key, int default_value)
     return default_value;
 }
 
+std::string Settings::get(const std::string& key, const std::string& default_value)
+{
+    auto c = m_impl->cache.find(key);
+    if (c != m_impl->cache.end())
+        return c->second;
+
+    m_impl->config_qry.reset();
+    m_impl->config_qry.bind(":key", key, sqlite3pp::nocopy);
+
+    auto i = m_impl->config_qry.begin();
+    if (i != m_impl->config_qry.end())
+    {
+        // careful for NULL values
+        auto v = (*i).get<char const*>(0);
+        if (v)
+        {
+            m_impl->cache[key] = v;
+            return v;
+        }
+    }
+
+    return default_value;
+}
+
 void Settings::temp_log(float temp)
 {
     sqlite3pp::command cmd(m_impl->db,

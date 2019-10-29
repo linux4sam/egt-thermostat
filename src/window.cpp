@@ -3,8 +3,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include "window.h"
 #include "pages.h"
+#include "settings.h"
+#include "window.h"
+#include <chrono>
 
 using namespace egt;
 using namespace std;
@@ -17,7 +19,8 @@ ThermostatWindow::ThermostatWindow()
     notebook = make_shared<Notebook>();
 
     m_pages["idle"] = make_shared<IdlePage>(*this, m_logic);
-    m_pages["main"] = make_shared<MainPage>(*this, m_logic);
+    auto main_page = make_shared<MainPage>(*this, m_logic);
+    m_pages["main"] = main_page;
     m_pages["menu"] = make_shared<MenuPage>(*this, m_logic);
     m_pages["mode"] = make_shared<ModePage>(*this, m_logic);
     m_pages["homecontent"] = make_shared<HomeContentPage>(*this, m_logic);
@@ -40,6 +43,34 @@ ThermostatWindow::ThermostatWindow()
     }, {eventid::raw_pointer_down});
 
     goto_page("main");
+
+    m_screen_brightness_timer.on_timeout([]()
+    {
+        const auto brightness = settings().get("sleep_brightness",
+                                               Application::instance().screen()->max_brightness() / 2);
+
+        Application::instance().screen()->set_brightness(brightness);
+    });
+
+    m_idle_timer.change_duration(std::chrono::seconds(settings().get("sleep_timeout",20)));
+    m_idle_timer.on_timeout([this]()
+    {
+        this->idle();
+        m_screen_brightness_timer.start();
+    });
+    m_idle_timer.start();
+
+    // on any input, reset idle timer
+    Input::global_input().on_event([this, main_page](Event & event)
+    {
+        main_page->shrink_camera();
+        m_screen_brightness_timer.cancel();
+        Application::instance().screen()->set_brightness(std::stoi(settings().get("normal_brightness")));
+        m_idle_timer.start();
+    }, {eventid::raw_pointer_down,
+        eventid::raw_pointer_up,
+        eventid::raw_pointer_move
+       });
 }
 
 void ThermostatWindow::idle()

@@ -34,6 +34,23 @@ static std::string current_date()
     return ss.str();
 }
 
+static void update_time(ThermostatWindow& win)
+{
+    auto l1 = win.find_child<Label>("date_label1");
+    if (l1)
+        l1->set_text(current_date());
+    auto l2 = win.find_child<Label>("date_label2");
+    if (l2)
+        l2->set_text(current_date());
+
+    auto l3 = win.find_child<Label>("time_label1");
+    if (l3)
+        l3->set_text(current_time());
+    auto l4 = win.find_child<Label>("time_label2");
+    if (l4)
+        l4->set_text(current_time());
+}
+
 int main(int argc, const char** argv)
 {
     Application app(argc, argv);
@@ -49,45 +66,21 @@ int main(int argc, const char** argv)
     global_theme().palette().set(Palette::ColorId::border, Palette::cyan, Palette::GroupId::checked);
     global_theme().palette().set(Palette::ColorId::button_bg, Color(Palette::cyan, 30), Palette::GroupId::active);
 
-    auto b = settings().get("normal_brightness");
-    if (b.empty())
-        settings().set("normal_brightness", std::to_string(Application::instance().screen()->max_brightness()));
-
-    Application::instance().screen()->set_brightness(std::stoi(settings().get("normal_brightness")));
+    // set initial screen brightness
+    auto screen = Application::instance().screen();
+    screen->set_brightness(settings().get("normal_brightness",
+                                          screen->max_brightness()));
 
     ThermostatWindow win;
     win.show();
 
-    auto l1 = win.find_child<Label>("date_label1");
-    assert(l1);
-    l1->set_text(current_date());
-    auto l2 = win.find_child<Label>("date_label2");
-    assert(l2);
-    l2->set_text(current_date());
+    update_time(win);
 
-    auto l3 = win.find_child<Label>("time_label1");
-    assert(l3);
-    l3->set_text(current_time());
-    auto l4 = win.find_child<Label>("time_label2");
-    assert(l4);
-    l4->set_text(current_time());
-
+    // update time labels periodically
     PeriodicTimer time_timer(std::chrono::seconds(1));
     time_timer.on_timeout([&win]()
     {
-        auto l1 = win.find_child<Label>("date_label1");
-        assert(l1);
-        l1->set_text(current_date());
-        auto l2 = win.find_child<Label>("date_label2");
-        assert(l2);
-        l2->set_text(current_date());
-
-        auto l3 = win.find_child<Label>("time_label1");
-        assert(l3);
-        l3->set_text(current_time());
-        auto l4 = win.find_child<Label>("time_label2");
-        assert(l4);
-        l4->set_text(current_time());
+        update_time(win);
     });
     time_timer.start();
 
@@ -96,13 +89,12 @@ int main(int argc, const char** argv)
     {
         const auto sensors = enumerate_temp_sensors();
         if (!sensors.empty())
-        {
             settings().set("temp_sensor", sensors[0]);
-        }
     }
 
     win.m_logic.change_current(get_temp_sensor(settings().get("temp_sensor")));
 
+    // update temp sensors periodically
     PeriodicTimer sensor_timer(std::chrono::seconds(1));
     sensor_timer.on_timeout([&win]()
     {

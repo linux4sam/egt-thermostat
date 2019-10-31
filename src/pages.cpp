@@ -843,6 +843,13 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
         cout << "camera error" << endl;
         m_camera->hide();
     }, {eventid::event2});
+
+    m_background_timer.on_timeout([this]()
+    {
+        m_window.set_background(Image("background" + std::to_string(m_background_index) + ".png"));
+        if (++m_background_index > 6)
+            m_background_index = 0;
+    });
 }
 
 static string& capitalize(string& s)
@@ -866,11 +873,13 @@ void MainPage::enter()
 {
     if (settings().get("background", "on") == "on")
     {
-        m_window.set_background(Image("background.png"));
+        m_window.set_background(Image("background" + std::to_string(m_background_index) + ".png"));
         set_boxtype(Theme::boxtype::none);
+        m_background_timer.start();
     }
     else
     {
+        m_background_timer.stop();
         m_window.set_background(Image());
         set_boxtype(Theme::boxtype::fill);
     }

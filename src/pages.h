@@ -59,8 +59,9 @@ struct MainPage : public ThermostatPage
     std::shared_ptr<egt::VerticalBoxSizer> m_layout;
     std::shared_ptr<egt::CameraWindow> m_camera;
     std::shared_ptr<egt::ImageLabel> m_otemp;
-
     bool m_camera_fullscreen{true};
+    egt::PeriodicTimer m_background_timer{std::chrono::seconds(5)};
+    int m_background_index{0};
 };
 
 struct SchedulePage : public ThermostatPage

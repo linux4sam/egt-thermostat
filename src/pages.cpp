@@ -28,9 +28,9 @@ static inline std::string format_temp(float temp)
 {
     ostringstream ss;
     if (settings().get("degrees") == "f")
-        ss << c2f(temp) << "°";
+        ss << std::round(c2f(temp)) << "°";
     else
-        ss << temp << "°";
+        ss << std::round(temp) << "°";
     return ss.str();
 }
 

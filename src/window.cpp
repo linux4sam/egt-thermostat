@@ -65,7 +65,9 @@ ThermostatWindow::ThermostatWindow()
     {
         main_page->shrink_camera();
         m_screen_brightness_timer.cancel();
-        Application::instance().screen()->set_brightness(std::stoi(settings().get("normal_brightness")));
+        auto screen = Application::instance().screen();
+        screen->set_brightness(settings().get("normal_brightness",
+                                              screen->max_brightness()));
         m_idle_timer.start();
     }, {eventid::raw_pointer_down,
         eventid::raw_pointer_up,

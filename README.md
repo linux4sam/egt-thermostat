@@ -18,6 +18,10 @@ Thermostat demonstration using the [Ensemble Graphics Toolkit (EGT)](https://git
 
 ![Screenshot](docs/screenshot0.png "Screenshot")
 
+![Screenshot](docs/screenshot1.png "Screenshot")
+
+![Screenshot](docs/screenshot2.png "Screenshot")
+
 # Compiling
 
 Install necessary egt dependencies by referring to the egt project README.md.

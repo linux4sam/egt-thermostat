@@ -13,7 +13,9 @@ using namespace egt;
 using namespace std;
 
 Logic::Logic()
-{}
+{
+    m_target = std::stof(settings().get("target_temp"));
+}
 
 std::string Logic::status_str(status s)
 {
@@ -34,6 +36,8 @@ void Logic::change_target(float value)
 {
     if (egt::detail::change_if_diff<>(m_target, value))
     {
+        settings().set("target_temp", std::to_string(m_target));
+
         process();
         invoke_handlers({eventid::event1});
     }
@@ -50,34 +54,34 @@ void Logic::change_current(float value)
 
 void Logic::process()
 {
-    if (detail::float_compare(m_current, 0))
-        return;
+    auto current = std::round(m_current);
+    auto target = std::round(m_target);
 
-    static const auto TEMP_EPSILON = 0.5f;
+    if (settings().get("degrees") == "f")
+    {
+        current = std::round(CtoF(m_current));
+        target = std::round(CtoF(m_target));
+    }
 
     // change status based on mode and current temps
     switch (m_mode)
     {
     case mode::automatic:
-        if (m_current > m_target &&
-            std::abs(m_current - m_target) > TEMP_EPSILON)
+        if (current > target)
             set_status(status::cooling, true);
-        else if (m_current < m_target &&
-                 std::abs(m_current - m_target) > TEMP_EPSILON)
+        else if (current < target)
             set_status(status::heating, true);
         else
             set_status(status::off, m_fan_mode == fanmode::on);
         break;
     case mode::cooling:
-        if (m_current > m_target &&
-            std::abs(m_current - m_target) > TEMP_EPSILON)
+        if (current > target)
             set_status(status::cooling, true);
         else
             set_status(status::off, m_fan_mode == fanmode::on);
         break;
     case mode::heating:
-        if (m_current < m_target &&
-            std::abs(m_current - m_target) > TEMP_EPSILON)
+        if (current < target)
             set_status(status::heating, true);
         else
             set_status(status::off, m_fan_mode == fanmode::on);
@@ -126,7 +130,6 @@ void Logic::set_status(status s, bool fan)
 
     if (f1 || s1)
     {
-        settings().status_log(m_status, m_fan_status);
         invoke_handlers({eventid::event1});
     }
 }

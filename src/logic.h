@@ -47,11 +47,15 @@ public:
 
     void process();
 
+    inline mode get_mode() const { return m_mode; }
+
     void set_mode(mode m);
 
     void set_fan_mode(fanmode m);
 
     inline status current_status() const { return m_status; }
+
+    inline bool current_fan_status() const { return m_fan_status; }
 
     void refresh();
 
@@ -62,7 +66,7 @@ protected:
     void set_status(status s, bool fan);
 
     float m_current{0.f};
-    float m_target{20.f};
+    float m_target{0.f};
 
     mode m_mode{mode::automatic};
     status m_status{status::off};
@@ -70,5 +74,20 @@ protected:
     fanmode m_fan_mode{fanmode::automatic};
     bool m_fan_status{false};
 };
+
+template<class T>
+constexpr T KtoC(T x) { return x - 273.15; }
+
+template<class T>
+constexpr T KtoF(T x) { return x * 9.0 / 5.0 - 459.67; }
+
+template<class T>
+constexpr T CtoK(T x) { return x + 273.15; }
+
+template<class T>
+constexpr T FtoK(T x) { return (x + 459.67) * 5.0 / 9.0; }
+
+template<class T>
+constexpr T CtoF(T x) { return KtoF(CtoK(x)); }
 
 #endif

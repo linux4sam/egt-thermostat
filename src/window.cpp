@@ -46,13 +46,11 @@ ThermostatWindow::ThermostatWindow()
 
     m_screen_brightness_timer.on_timeout([]()
     {
-        const auto brightness = settings().get("sleep_brightness",
-                                               Application::instance().screen()->max_brightness() / 2);
-
-        Application::instance().screen()->set_brightness(brightness);
+        const auto brightness = settings().get("sleep_brightness");
+        Application::instance().screen()->set_brightness(std::stoi(brightness));
     });
 
-    m_idle_timer.change_duration(std::chrono::seconds(settings().get("sleep_timeout", 20)));
+    m_idle_timer.change_duration(std::chrono::seconds(std::stoi(settings().get("sleep_timeout"))));
     m_idle_timer.on_timeout([this]()
     {
         this->idle();
@@ -61,18 +59,24 @@ ThermostatWindow::ThermostatWindow()
     m_idle_timer.start();
 
     // on any input, reset idle timer
-    Input::global_input().on_event([this, main_page](Event & event)
+    m_handle = Input::global_input().on_event([this, main_page](Event & event)
     {
         main_page->shrink_camera();
         m_screen_brightness_timer.cancel();
         auto screen = Application::instance().screen();
-        screen->set_brightness(settings().get("normal_brightness",
-                                              screen->max_brightness()));
+        screen->set_brightness(std::stoi(settings().get("normal_brightness")));
         m_idle_timer.start();
     }, {eventid::raw_pointer_down,
         eventid::raw_pointer_up,
-        eventid::raw_pointer_move
+        eventid::raw_pointer_move,
+        eventid::pointer_hold
        });
+
+    m_logic.on_event([this](Event&)
+    {
+        settings().status_log(m_logic.current_status(), m_logic.current_fan_status());
+        settings().temp_log(m_logic.current());
+    }, {eventid::event1});
 }
 
 void ThermostatWindow::idle()
@@ -105,4 +109,9 @@ void ThermostatWindow::pop_page()
 int ThermostatWindow::page_to_idx(const std::string& name)
 {
     return std::distance(m_pages.begin(), m_pages.find(name));
+}
+
+ThermostatWindow::~ThermostatWindow()
+{
+    Input::global_input().remove_handler(m_handle);
 }

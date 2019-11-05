@@ -33,6 +33,11 @@ Settings::Settings()
     : m_impl(new settings_impl)
 {}
 
+void Settings::set_default_callback(default_value_callback_t callback)
+{
+    m_default_callback = callback;
+}
+
 void Settings::set(const std::string& key, const std::string& value)
 {
     m_impl->cache[key] = value;
@@ -45,7 +50,7 @@ void Settings::set(const std::string& key, const std::string& value)
 
 std::string Settings::get(const std::string& key)
 {
-    auto c = m_impl->cache.find(key);
+    const auto c = m_impl->cache.find(key);
     if (c != m_impl->cache.end())
         return c->second;
 
@@ -62,57 +67,15 @@ std::string Settings::get(const std::string& key)
             m_impl->cache[key] = v;
             return v;
         }
+    }
+
+    if (m_default_callback)
+    {
+        m_impl->cache[key] = m_default_callback(key);
+        return m_impl->cache[key];
     }
 
     return {};
-}
-
-int Settings::get(const std::string& key, int default_value)
-{
-    auto c = m_impl->cache.find(key);
-    if (c != m_impl->cache.end())
-        return std::stoi(c->second);
-
-    m_impl->config_qry.reset();
-    m_impl->config_qry.bind(":key", key, sqlite3pp::nocopy);
-
-    auto i = m_impl->config_qry.begin();
-    if (i != m_impl->config_qry.end())
-    {
-        // careful for NULL values
-        auto v = (*i).get<char const*>(0);
-        if (v)
-        {
-            m_impl->cache[key] = v;
-            return std::stoi(v);
-        }
-    }
-
-    return default_value;
-}
-
-std::string Settings::get(const std::string& key, const std::string& default_value)
-{
-    auto c = m_impl->cache.find(key);
-    if (c != m_impl->cache.end())
-        return c->second;
-
-    m_impl->config_qry.reset();
-    m_impl->config_qry.bind(":key", key, sqlite3pp::nocopy);
-
-    auto i = m_impl->config_qry.begin();
-    if (i != m_impl->config_qry.end())
-    {
-        // careful for NULL values
-        auto v = (*i).get<char const*>(0);
-        if (v)
-        {
-            m_impl->cache[key] = v;
-            return v;
-        }
-    }
-
-    return default_value;
 }
 
 void Settings::temp_log(float temp)

@@ -17,7 +17,7 @@ struct ThermostatPage : public egt::NotebookTab
         : m_window(window),
           m_logic(logic)
     {
-        set_color(egt::Palette::ColorId::bg, egt::Color::css("#4a5157"));
+        set_color(egt::Palette::ColorId::bg, egt::Color(38, 50, 56));
     }
 
     virtual ~ThermostatPage() = default;
@@ -64,14 +64,18 @@ struct MainPage : public ThermostatPage
     int m_background_index{0};
 };
 
-struct SchedulePage : public ThermostatPage
+struct SettingsPage : public ThermostatPage
 {
-    SchedulePage(ThermostatWindow& window, Logic& logic);
+    SettingsPage(ThermostatWindow& window, Logic& logic)
+        : ThermostatPage(window, logic)
+    {}
 
-    virtual bool leave() override;
+    std::shared_ptr<egt::VerticalBoxSizer> create_layout(const std::string& title);
+
+    virtual ~SettingsPage() = default;
 };
 
-struct ModePage : public ThermostatPage
+struct ModePage : public SettingsPage
 {
     ModePage(ThermostatWindow& window, Logic& logic);
 
@@ -80,7 +84,16 @@ struct ModePage : public ThermostatPage
     std::unique_ptr<egt::ButtonGroup> m_button_group;
 };
 
-struct FanPage : public ThermostatPage
+struct SchedulePage : public SettingsPage
+{
+    SchedulePage(ThermostatWindow& window, Logic& logic);
+
+    virtual bool leave() override;
+
+    std::shared_ptr<egt::ToggleBox> m_enabled;
+};
+
+struct FanPage : public SettingsPage
 {
     FanPage(ThermostatWindow& window, Logic& logic);
 
@@ -89,7 +102,7 @@ struct FanPage : public ThermostatPage
     std::unique_ptr<egt::ButtonGroup> m_button_group;
 };
 
-struct IdleSettingsPage : public ThermostatPage
+struct IdleSettingsPage : public SettingsPage
 {
     IdleSettingsPage(ThermostatWindow& window, Logic& logic);
 
@@ -99,17 +112,17 @@ struct IdleSettingsPage : public ThermostatPage
     std::shared_ptr<egt::Slider> m_sleep_brightness;
 };
 
-struct ScreenBrightnessPage : public ThermostatPage
+struct ScreenBrightnessPage : public SettingsPage
 {
     ScreenBrightnessPage(ThermostatWindow& window, Logic& logic);
 };
 
-struct MenuPage : public ThermostatPage
+struct MenuPage : public SettingsPage
 {
     MenuPage(ThermostatWindow& window, Logic& logic);
 };
 
-struct HomeContentPage : public ThermostatPage
+struct HomeContentPage : public SettingsPage
 {
     HomeContentPage(ThermostatWindow& window, Logic& logic);
 
@@ -118,9 +131,10 @@ struct HomeContentPage : public ThermostatPage
     std::shared_ptr<egt::ToggleBox> m_degrees;
     std::shared_ptr<egt::ToggleBox> m_usebackground;
     std::shared_ptr<egt::ToggleBox> m_showoutside;
+    std::shared_ptr<egt::ToggleBox> m_time_format;
 };
 
-struct SensorsPage : public ThermostatPage
+struct SensorsPage : public SettingsPage
 {
     SensorsPage(ThermostatWindow& window, Logic& logic);
 
@@ -129,7 +143,7 @@ struct SensorsPage : public ThermostatPage
     virtual bool leave() override;
 };
 
-struct AboutPage : public ThermostatPage
+struct AboutPage : public SettingsPage
 {
     AboutPage(ThermostatWindow& window, Logic& logic);
 };

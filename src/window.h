@@ -35,6 +35,9 @@ public:
     std::deque<std::string> m_queue;
     egt::Timer m_screen_brightness_timer{std::chrono::seconds(5)};
     egt::PeriodicTimer m_idle_timer;
+    egt::detail::Object::handle_t m_handle{0};
+
+    virtual ~ThermostatWindow();
 };
 
 #endif

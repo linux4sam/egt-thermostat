@@ -39,7 +39,7 @@ void Logic::change_target(float value)
         settings().set("target_temp", std::to_string(m_target));
 
         process();
-        invoke_handlers({eventid::event1});
+        on_change.invoke();
     }
 }
 
@@ -48,7 +48,7 @@ void Logic::change_current(float value)
     if (egt::detail::change_if_diff<>(m_current, value))
     {
         process();
-        invoke_handlers({eventid::event1});
+        on_change.invoke();
     }
 }
 
@@ -68,26 +68,26 @@ void Logic::process()
     {
     case mode::automatic:
         if (current > target)
-            set_status(status::cooling, true);
+            change_status(status::cooling, true);
         else if (current < target)
-            set_status(status::heating, true);
+            change_status(status::heating, true);
         else
-            set_status(status::off, m_fan_mode == fanmode::on);
+            change_status(status::off, m_fan_mode == fanmode::on);
         break;
     case mode::cooling:
         if (current > target)
-            set_status(status::cooling, true);
+            change_status(status::cooling, true);
         else
-            set_status(status::off, m_fan_mode == fanmode::on);
+            change_status(status::off, m_fan_mode == fanmode::on);
         break;
     case mode::heating:
         if (current < target)
-            set_status(status::heating, true);
+            change_status(status::heating, true);
         else
-            set_status(status::off, m_fan_mode == fanmode::on);
+            change_status(status::off, m_fan_mode == fanmode::on);
         break;
     case mode::off:
-        set_status(status::off, m_fan_mode == fanmode::on);
+        change_status(status::off, m_fan_mode == fanmode::on);
         break;
     };
 }
@@ -97,7 +97,7 @@ void Logic::set_mode(mode m)
     if (egt::detail::change_if_diff<>(m_mode, m))
     {
         process();
-        invoke_handlers({eventid::event1});
+        on_change.invoke();
     }
 }
 
@@ -106,11 +106,11 @@ void Logic::set_fan_mode(fanmode m)
     if (egt::detail::change_if_diff<>(m_fan_mode, m))
     {
         process();
-        invoke_handlers({eventid::event1});
+        on_change.invoke();
     }
 }
 
-void Logic::set_status(status s, bool fan)
+void Logic::change_status(status s, bool fan)
 {
     auto f1 = egt::detail::change_if_diff<>(m_fan_status, fan);
     if (f1)
@@ -130,11 +130,11 @@ void Logic::set_status(status s, bool fan)
 
     if (f1 || s1)
     {
-        invoke_handlers({eventid::event1});
+        on_change.invoke();
     }
 }
 
 void Logic::refresh()
 {
-    invoke_handlers({eventid::event1});
+    on_change.invoke();
 }

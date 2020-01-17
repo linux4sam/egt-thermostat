@@ -12,7 +12,7 @@
 #include "logic.h"
 #include <vector>
 
-struct Settings : public egt::detail::noncopyable
+struct Settings : public egt::detail::NonCopyable
 {
     using default_value_callback_t = std::function<std::string(const std::string&)>;
 

@@ -6,10 +6,11 @@
 #ifndef LOGIC_H
 #define LOGIC_H
 
+#include <egt/detail/signal.h>
 #include <egt/ui>
 #include <string>
 
-class Logic : public egt::detail::Object
+class Logic
 {
 public:
     enum class mode
@@ -32,6 +33,8 @@ public:
         cooling,
         heating,
     };
+
+    egt::detail::Signal<> on_change;
 
     Logic();
 
@@ -63,7 +66,7 @@ public:
 
 protected:
 
-    void set_status(status s, bool fan);
+    void change_status(status s, bool fan);
 
     float m_current{0.f};
     float m_target{0.f};

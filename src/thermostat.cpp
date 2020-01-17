@@ -45,25 +45,25 @@ static void update_time(ThermostatWindow& win)
 {
     auto l1 = win.find_child<Label>("date_label1");
     if (l1)
-        l1->set_text(current_date());
+        l1->text(current_date());
     auto l2 = win.find_child<Label>("date_label2");
     if (l2)
-        l2->set_text(current_date());
+        l2->text(current_date());
 
     auto l3 = win.find_child<Label>("time_label1");
     if (l3)
-        l3->set_text(current_time());
+        l3->text(current_time());
     auto l4 = win.find_child<Label>("time_label2");
     if (l4)
-        l4->set_text(current_time());
+        l4->text(current_time());
 }
 
 int main(int argc, const char** argv)
 {
     Application app(argc, argv);
 
-    detail::add_search_path(DATADIR "/egt/thermostat/");
-    detail::add_search_path("./images");
+    add_search_path(DATADIR "/egt/thermostat/");
+    add_search_path("./images");
 
     global_theme().palette().set(Palette::ColorId::label_text, Palette::white);
     global_theme().palette().set(Palette::ColorId::label_text, Palette::cyan, Palette::GroupId::active);
@@ -115,7 +115,7 @@ int main(int argc, const char** argv)
     });
 
     // set initial screen brightness
-    Application::instance().screen()->set_brightness(std::stoi(settings().get("normal_brightness")));
+    Application::instance().screen()->brightness(std::stoi(settings().get("normal_brightness")));
 
     ThermostatWindow win;
     win.show();
@@ -138,7 +138,7 @@ int main(int argc, const char** argv)
 
     auto ret = app.run();
 
-    Application::instance().screen()->set_brightness(
+    Application::instance().screen()->brightness(
         Application::instance().screen()->max_brightness());
 
     return ret;

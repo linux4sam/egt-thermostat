@@ -13,7 +13,7 @@ using namespace std;
 
 ThermostatWindow::ThermostatWindow()
 {
-    auto hsizer = make_shared<BoxSizer>(orientation::horizontal);
+    auto hsizer = make_shared<BoxSizer>(Orientation::horizontal);
     add(expand(hsizer));
 
     notebook = make_shared<Notebook>();
@@ -40,14 +40,14 @@ ThermostatWindow::ThermostatWindow()
     idle->on_event([this, idle](Event&)
     {
         goto_page("main");
-    }, {eventid::raw_pointer_down});
+    }, {EventId::raw_pointer_down});
 
     goto_page("main");
 
     m_screen_brightness_timer.on_timeout([]()
     {
         const auto brightness = settings().get("sleep_brightness");
-        Application::instance().screen()->set_brightness(std::stoi(brightness));
+        Application::instance().screen()->brightness(std::stoi(brightness));
     });
 
     m_idle_timer.change_duration(std::chrono::seconds(std::stoi(settings().get("sleep_timeout"))));
@@ -64,38 +64,38 @@ ThermostatWindow::ThermostatWindow()
         main_page->shrink_camera();
         m_screen_brightness_timer.cancel();
         auto screen = Application::instance().screen();
-        screen->set_brightness(std::stoi(settings().get("normal_brightness")));
+        screen->brightness(std::stoi(settings().get("normal_brightness")));
         m_idle_timer.start();
-    }, {eventid::raw_pointer_down,
-        eventid::raw_pointer_up,
-        eventid::raw_pointer_move,
-        eventid::pointer_hold
+    }, {EventId::raw_pointer_down,
+        EventId::raw_pointer_up,
+        EventId::raw_pointer_move,
+        EventId::pointer_hold
        });
 
-    m_logic.on_event([this](Event&)
+    m_logic.on_change([this]()
     {
         settings().status_log(m_logic.current_status(), m_logic.current_fan_status());
         settings().temp_log(m_logic.current());
-    }, {eventid::event1});
+    });
 }
 
 void ThermostatWindow::idle()
 {
     m_queue.clear();
-    notebook->set_selected(page_to_idx("idle"));
+    notebook->selected(page_to_idx("idle"));
 }
 
 void ThermostatWindow::goto_page(const std::string& name)
 {
     m_queue.clear();
     m_queue.push_back(name);
-    notebook->set_selected(page_to_idx(name));
+    notebook->selected(page_to_idx(name));
 }
 
 void ThermostatWindow::push_page(const std::string& name)
 {
     m_queue.push_back(name);
-    notebook->set_selected(page_to_idx(name));
+    notebook->selected(page_to_idx(name));
 }
 
 void ThermostatWindow::pop_page()
@@ -103,7 +103,7 @@ void ThermostatWindow::pop_page()
     assert(!m_queue.empty());
     m_queue.pop_back();
     auto prev = m_queue.back();
-    notebook->set_selected(page_to_idx(prev));
+    notebook->selected(page_to_idx(prev));
 }
 
 int ThermostatWindow::page_to_idx(const std::string& name)

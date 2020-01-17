@@ -32,83 +32,83 @@ static inline std::string format_temp(float temp)
 
 static void selectable_btn_setup(const shared_ptr<ImageButton>& button)
 {
-    button->set_color(Palette::ColorId::button_bg, Palette::transparent);
-    button->set_color(Palette::ColorId::button_bg, Color(0, 255, 255, 30), Palette::GroupId::checked);
-    button->set_color(Palette::ColorId::button_bg, Palette::transparent, Palette::GroupId::active);
-    button->set_color(Palette::ColorId::border, Palette::transparent);
-    button->set_boxtype(Theme::boxtype::fill);
-    button->set_border(2);
-    button->set_margin(5);
-    button->set_padding(10);
-    button->set_image_align(alignmask::center | alignmask::top);
+    button->color(Palette::ColorId::button_bg, Palette::transparent);
+    button->color(Palette::ColorId::button_bg, Color(0, 255, 255, 30), Palette::GroupId::checked);
+    button->color(Palette::ColorId::button_bg, Palette::transparent, Palette::GroupId::active);
+    button->color(Palette::ColorId::border, Palette::transparent);
+    button->boxtype(Theme::BoxFlag::fill);
+    button->border(2);
+    button->margin(5);
+    button->padding(10);
+    button->image_align(AlignFlag::center | AlignFlag::top);
 
     std::weak_ptr<ImageButton> weak_button(button);
     button->on_click([weak_button](Event&)
     {
         auto button = weak_button.lock();
         if (button)
-            button->set_checked(true);
+            button->checked(true);
     });
 }
 
 IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
     : ThermostatPage(window, logic)
 {
-    set_color(Palette::ColorId::bg, Palette::black);
+    color(Palette::ColorId::bg, Palette::black);
 
     auto date = make_shared<Label>("",
-                                   alignmask::center);
-    date->set_color(Palette::ColorId::bg, Palette::transparent);
-    date->set_align(alignmask::center | alignmask::top);
-    date->set_margin(10);
-    date->set_name("date_label1");
+                                   AlignFlag::center);
+    date->color(Palette::ColorId::bg, Palette::transparent);
+    date->align(AlignFlag::center | AlignFlag::top);
+    date->margin(10);
+    date->name("date_label1");
     add(date);
 
-    auto leftbox = make_shared<BoxSizer>(orientation::vertical);
-    leftbox->set_align(alignmask::center | alignmask::left);
-    leftbox->set_margin(10);
+    auto leftbox = make_shared<BoxSizer>(Orientation::vertical);
+    leftbox->align(AlignFlag::center | AlignFlag::left);
+    leftbox->margin(10);
     add(leftbox);
 
     auto time = make_shared<Label>();
-    time->set_name("time_label1");
+    time->name("time_label1");
     leftbox->add(egt::center(time));
 
     m_otemp = make_shared<ImageLabel>(Image("02d.png"), "Outside");
-    m_otemp->set_font(Font(16));
-    m_otemp->set_image_align(alignmask::center | alignmask::top);
+    m_otemp->font(Font(16));
+    m_otemp->image_align(AlignFlag::center | AlignFlag::top);
     leftbox->add(egt::center(m_otemp));
 
     auto logo = std::make_shared<ImageButton>(Image("@128px/egt_logo_white.png"));
-    logo->set_boxtype(Theme::boxtype::none);
-    logo->set_align(alignmask::center | alignmask::bottom);
-    logo->set_margin(10);
+    logo->boxtype().clear();
+    logo->align(AlignFlag::center | AlignFlag::bottom);
+    logo->margin(10);
     add(logo);
 
-    auto hsizer = make_shared<BoxSizer>(orientation::vertical);
-    hsizer->set_align(alignmask::center);
+    auto hsizer = make_shared<BoxSizer>(Orientation::vertical);
+    hsizer->align(AlignFlag::center);
     add(hsizer);
 
     m_temp = make_shared<Label>();
-    m_temp->set_font(Font(200));
-    m_temp->set_margin(10);
+    m_temp->font(Font(200));
+    m_temp->margin(10);
     hsizer->add(m_temp);
 
     m_status = make_shared<Label>();
-    m_status->set_font(Font(24));
+    m_status->font(Font(24));
     hsizer->add(m_status);
 
     apply_logic_change(m_logic.current_status());
-    logic.on_event([this](Event&)
+    logic.on_change([this]()
     {
         apply_logic_change(m_logic.current_status());
-    }, {eventid::event1});
+    });
 }
 
 void IdlePage::enter()
 {
     if (settings().get("outside") == "on")
     {
-        m_otemp->set_text(std::string(_("Outside")) + " " + format_temp(30));
+        m_otemp->text(std::string(_("Outside")) + " " + format_temp(30));
         m_otemp->show();
     }
     else
@@ -119,22 +119,22 @@ void IdlePage::enter()
 
 void IdlePage::apply_logic_change(Logic::status status)
 {
-    m_temp->set_text(format_temp(m_logic.current()));
+    m_temp->text(format_temp(m_logic.current()));
 
     switch (status)
     {
     case Logic::status::off:
     {
         if (m_logic.get_mode() == Logic::mode::off)
-            m_status->set_text(Logic::status_str(m_logic.current_status()));
+            m_status->text(Logic::status_str(m_logic.current_status()));
         else
-            m_status->set_text(Logic::status_str(m_logic.current_status()) + " at " + format_temp(m_logic.target()));
+            m_status->text(Logic::status_str(m_logic.current_status()) + " at " + format_temp(m_logic.target()));
         break;
     }
     case Logic::status::cooling:
     case Logic::status::heating:
     {
-        m_status->set_text(Logic::status_str(m_logic.current_status()) + " to " + format_temp(m_logic.target()));
+        m_status->text(Logic::status_str(m_logic.current_status()) + " to " + format_temp(m_logic.target()));
         break;
     }
     }
@@ -159,18 +159,18 @@ class TempLabel : public Label
                           content_area() + Point(4, 4),
                           text(),
                           font(),
-                          TextBox::flags_type({TextBox::flag::multiline, TextBox::flag::word_wrap}),
+                          {TextBox::TextFlag::multiline, TextBox::TextFlag::word_wrap},
                           text_align(),
-                          justification::middle,
+                          Justification::middle,
                           shadow);
 
         detail::draw_text(painter,
                           content_area(),
                           text(),
                           font(),
-                          TextBox::flags_type({TextBox::flag::multiline, TextBox::flag::word_wrap}),
+                          {TextBox::TextFlag::multiline, TextBox::TextFlag::word_wrap},
                           text_align(),
-                          justification::middle,
+                          Justification::middle,
                           color);
     }
 };
@@ -179,8 +179,8 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     : ThermostatPage(window, logic)
 {
     m_menu = make_shared<ImageButton>(Image("menu.png"));
-    m_menu->set_boxtype(Theme::boxtype::none);
-    m_menu->set_padding(0);
+    m_menu->boxtype().clear();
+    m_menu->padding(0);
     m_menu->move(Point(0, 20));
     add(m_menu);
     m_menu->on_click([this](Event&)
@@ -189,51 +189,51 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     });
 
     auto date = make_shared<Label>("",
-                                   alignmask::center);
-    date->set_color(Palette::ColorId::bg, Palette::transparent);
-    date->set_align(alignmask::center | alignmask::top);
-    date->set_margin(10);
-    date->set_name("date_label2");
+                                   AlignFlag::center);
+    date->color(Palette::ColorId::bg, Palette::transparent);
+    date->align(AlignFlag::center | AlignFlag::top);
+    date->margin(10);
+    date->name("date_label2");
     add(date);
 
-    auto leftbox = make_shared<BoxSizer>(orientation::vertical);
-    leftbox->set_align(alignmask::center | alignmask::left);
-    leftbox->set_margin(10);
+    auto leftbox = make_shared<BoxSizer>(Orientation::vertical);
+    leftbox->align(AlignFlag::center | AlignFlag::left);
+    leftbox->margin(10);
     add(leftbox);
 
     auto time = make_shared<Label>();
-    time->set_name("time_label2");
+    time->name("time_label2");
     leftbox->add(egt::center(time));
 
     m_otemp = make_shared<ImageLabel>(Image("02d.png"), "Outside");
-    m_otemp->set_font(Font(16));
-    m_otemp->set_image_align(alignmask::center | alignmask::top);
+    m_otemp->font(Font(16));
+    m_otemp->image_align(AlignFlag::center | AlignFlag::top);
     leftbox->add(egt::center(m_otemp));
 
-    auto hsizer = make_shared<BoxSizer>(orientation::vertical);
-    hsizer->set_align(alignmask::center);
+    auto hsizer = make_shared<BoxSizer>(Orientation::vertical);
+    hsizer->align(AlignFlag::center);
     add(hsizer);
 
     m_temp = make_shared<TempLabel>();
-    m_temp->set_font(Font(200));
-    m_temp->set_margin(10);
+    m_temp->font(Font(200));
+    m_temp->margin(10);
     hsizer->add(m_temp);
 
     m_status = make_shared<Label>();
-    m_status->set_font(Font(24));
+    m_status->font(Font(24));
     hsizer->add(m_status);
 
-    m_layout = make_shared<VerticalBoxSizer>(justification::justify);
-    m_layout->set_align(alignmask::right | alignmask::center);
-    m_layout->set_margin(50);
+    m_layout = make_shared<VerticalBoxSizer>(Justification::justify);
+    m_layout->align(AlignFlag::right | AlignFlag::center);
+    m_layout->margin(50);
     add(m_layout);
 
     static auto btn_setup = [](shared_ptr<ImageButton>& button)
     {
-        button->set_color(Palette::ColorId::button_bg, Palette::transparent);
-        button->set_color(Palette::ColorId::button_bg, Palette::transparent, Palette::GroupId::active);
-        button->set_color(Palette::ColorId::border, Palette::transparent);
-        button->set_boxtype(Theme::boxtype::none);
+        button->color(Palette::ColorId::button_bg, Palette::transparent);
+        button->color(Palette::ColorId::button_bg, Palette::transparent, Palette::GroupId::active);
+        button->color(Palette::ColorId::border, Palette::transparent);
+        button->boxtype().clear();
     };
 
     auto up = make_shared<ImageButton>(Image("up.png"));
@@ -252,14 +252,14 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
         {
             switch (event.id())
             {
-            case eventid::raw_pointer_down:
-                up->set_image(Image("up2.png"));
+            case EventId::raw_pointer_down:
+                up->image(Image("up2.png"));
                 break;
-            case eventid::raw_pointer_up:
-                up->set_image(Image("up.png"));
+            case EventId::raw_pointer_up:
+                up->image(Image("up.png"));
                 break;
-            case eventid::pointer_click:
-            case eventid::pointer_hold:
+            case EventId::pointer_click:
+            case EventId::pointer_hold:
                 if (settings().get("degrees") == "f")
                     m_logic.change_target(m_logic.target() + f2c<float>(1.));
                 else
@@ -279,14 +279,14 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
         {
             switch (event.id())
             {
-            case eventid::raw_pointer_down:
-                down->set_image(Image("down2.png"));
+            case EventId::raw_pointer_down:
+                down->image(Image("down2.png"));
                 break;
-            case eventid::raw_pointer_up:
-                down->set_image(Image("down.png"));
+            case EventId::raw_pointer_up:
+                down->image(Image("down.png"));
                 break;
-            case eventid::pointer_click:
-            case eventid::pointer_hold:
+            case EventId::pointer_click:
+            case EventId::pointer_hold:
                 if (settings().get("degrees") == "f")
                     m_logic.change_target(m_logic.target() - f2c<float>(1.));
                 else
@@ -299,20 +299,20 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     });
 
     apply_logic_change(m_logic.current_status());
-    logic.on_event([this](Event&)
+    logic.on_change([this]()
     {
         apply_logic_change(m_logic.current_status());
-    }, {eventid::event1});
+    });
 
     auto sizer = make_shared<HorizontalBoxSizer>();
     add(expand_horizontal(bottom(sizer)));
 
     m_mode = make_shared<ImageButton>();
-    m_mode->set_padding(10);
-    m_mode->set_boxtype(Theme::boxtype::fill);
-    m_mode->set_image_align(alignmask::center | alignmask::left);
-    m_mode->set_color(Palette::ColorId::button_bg, Color(255, 255, 255, 75));
-    m_mode->set_color(Palette::ColorId::button_bg, Color(Palette::cyan, 75), Palette::GroupId::active);
+    m_mode->padding(10);
+    m_mode->boxtype(Theme::BoxFlag::fill);
+    m_mode->image_align(AlignFlag::center | AlignFlag::left);
+    m_mode->color(Palette::ColorId::button_bg, Color(255, 255, 255, 75));
+    m_mode->color(Palette::ColorId::button_bg, Color(Palette::cyan, 75), Palette::GroupId::active);
     sizer->add(expand(m_mode));
 
     m_mode->on_click([this](Event&)
@@ -321,17 +321,17 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     });
 
     auto line = make_shared<LineWidget>();
-    line->set_color(Palette::ColorId::border, Palette::transparent);
-    line->set_horizontal(false);
-    line->set_width(2);
+    line->color(Palette::ColorId::border, Palette::transparent);
+    line->horizontal(false);
+    line->width(2);
     sizer->add(expand_vertical(line));
 
     m_fan = make_shared<ImageButton>();
-    m_fan->set_padding(10);
-    m_fan->set_boxtype(Theme::boxtype::fill);
-    m_fan->set_image_align(alignmask::center | alignmask::left);
-    m_fan->set_color(Palette::ColorId::button_bg, Color(255, 255, 255, 75));
-    m_fan->set_color(Palette::ColorId::button_bg, Color(Palette::cyan, 75), Palette::GroupId::active);
+    m_fan->padding(10);
+    m_fan->boxtype(Theme::BoxFlag::fill);
+    m_fan->image_align(AlignFlag::center | AlignFlag::left);
+    m_fan->color(Palette::ColorId::button_bg, Color(255, 255, 255, 75));
+    m_fan->color(Palette::ColorId::button_bg, Color(Palette::cyan, 75), Palette::GroupId::active);
     sizer->add(expand(m_fan));
 
     m_fan->on_click([this](Event&)
@@ -344,27 +344,27 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     add(m_camera);
 
     auto camera_button = make_shared<Button>();
-    camera_button->set_box(Rect(Point(m_menu->width() + 10, 10), m_camera->size() / 2));
+    camera_button->box(Rect(Point(m_menu->width() + 10, 10), m_camera->size() / 2));
     add(camera_button);
-    camera_button->set_boxtype(Theme::boxtype::none);
+    camera_button->boxtype().clear();
     camera_button->on_event([this](Event & event)
     {
         if (!m_camera_fullscreen)
         {
             m_camera->move(Point(0, 0));
-            m_camera->set_scale(2.5, 2.5);
+            m_camera->scale(2.5, 2.5);
             m_camera_fullscreen = true;
         }
-    }, {eventid::pointer_click});
+    }, {EventId::pointer_click});
 
-    m_camera->on_event([this](Event & event)
+    m_camera->on_error([this]()
     {
         m_camera->hide();
-    }, {eventid::event2});
+    });
 
     m_background_timer.on_timeout([this]()
     {
-        m_window.set_background(Image("background" + std::to_string(m_background_index) + ".png"));
+        m_window.background(Image("background" + std::to_string(m_background_index) + ".png"));
         if (++m_background_index > 5)
             m_background_index = 0;
     });
@@ -383,7 +383,7 @@ void MainPage::shrink_camera()
     if (m_camera_fullscreen)
     {
         m_camera->move(Point(m_menu->width() + 10, 10));
-        m_camera->set_scale(.5, .5);
+        m_camera->scale(.5, .5);
         m_camera_fullscreen = false;
     }
 }
@@ -392,20 +392,20 @@ void MainPage::enter()
 {
     if (settings().get("background") == "on")
     {
-        m_window.set_background(Image("background" + std::to_string(m_background_index) + ".png"));
-        set_boxtype(Theme::boxtype::none);
+        m_window.background(Image("background" + std::to_string(m_background_index) + ".png"));
+        boxtype().clear();
         m_background_timer.start();
     }
     else
     {
         m_background_timer.stop();
-        m_window.set_background(Image());
-        set_boxtype(Theme::boxtype::fill);
+        m_window.background(Image());
+        boxtype(Theme::BoxFlag::fill);
     }
 
     if (settings().get("outside") == "on")
     {
-        m_otemp->set_text(std::string(_("Outside")) + " " + format_temp(30));
+        m_otemp->text(std::string(_("Outside")) + " " + format_temp(30));
         m_otemp->show();
     }
     else
@@ -413,14 +413,14 @@ void MainPage::enter()
         m_otemp->hide();
     }
 
-    m_layout->set_visible(settings().get("mode") != "off");
+    m_layout->visible(settings().get("mode") != "off");
 
     auto mode = settings().get("mode");
-    m_mode->set_text(string("System ") + capitalize(mode));
-    m_mode->set_image(Image(mode + ".png", 0.3));
+    m_mode->text(string("System ") + capitalize(mode));
+    m_mode->image(Image(mode + ".png", 0.3));
     auto fan = settings().get("fan");
-    m_fan->set_text(string("Fan ") + capitalize(fan));
-    m_fan->set_image(Image("fan_" + fan + ".png", 0.3));
+    m_fan->text(string("Fan ") + capitalize(fan));
+    m_fan->image(Image("fan_" + fan + ".png", 0.3));
 
     if (m_camera->start())
         m_camera->show();
@@ -436,30 +436,30 @@ bool MainPage::leave()
 
 void MainPage::apply_logic_change(Logic::status status)
 {
-    m_temp->set_text(format_temp(m_logic.current()));
+    m_temp->text(format_temp(m_logic.current()));
 
     switch (status)
     {
     case Logic::status::off:
     {
-        set_color(Palette::ColorId::bg, Palette::gray);
+        color(Palette::ColorId::bg, Palette::gray);
         if (m_logic.get_mode() == Logic::mode::off)
-            m_status->set_text(Logic::status_str(m_logic.current_status()));
+            m_status->text(Logic::status_str(m_logic.current_status()));
         else
-            m_status->set_text(Logic::status_str(m_logic.current_status()) + " at " + format_temp(m_logic.target()));
+            m_status->text(Logic::status_str(m_logic.current_status()) + " at " + format_temp(m_logic.target()));
         break;
         break;
     }
     case Logic::status::cooling:
     {
-        set_color(Palette::ColorId::bg, Color::css("#0289cd"));
-        m_status->set_text(Logic::status_str(m_logic.current_status()) + " to " + format_temp(m_logic.target()));
+        color(Palette::ColorId::bg, Color::css("#0289cd"));
+        m_status->text(Logic::status_str(m_logic.current_status()) + " to " + format_temp(m_logic.target()));
         break;
     }
     case Logic::status::heating:
     {
-        set_color(Palette::ColorId::bg, Color::css("#f76707"));
-        m_status->set_text(Logic::status_str(m_logic.current_status()) + " to " + format_temp(m_logic.target()));
+        color(Palette::ColorId::bg, Color::css("#f76707"));
+        m_status->text(Logic::status_str(m_logic.current_status()) + " to " + format_temp(m_logic.target()));
         break;
     }
     }
@@ -469,21 +469,21 @@ std::shared_ptr<VerticalBoxSizer> SettingsPage::create_layout(const std::string&
 {
     static const auto TITLE_FONT_SIZE = 24;
 
-    auto layout = make_shared<VerticalBoxSizer>(justification::start);
+    auto layout = make_shared<VerticalBoxSizer>(Justification::start);
     add(expand(layout));
 
     auto title_frame = make_shared<Frame>();
-    title_frame->set_boxtype(Theme::boxtype::fill);
-    title_frame->set_color(Palette::ColorId::bg, Color(55, 71, 79));
-    title_frame->set_height(50);
+    title_frame->boxtype(Theme::BoxFlag::fill);
+    title_frame->color(Palette::ColorId::bg, Color(55, 71, 79));
+    title_frame->height(50);
     layout->add(expand_horizontal(title_frame));
 
     auto title_menu = make_shared<Label>(title);
-    title_menu->set_font(Font(TITLE_FONT_SIZE));
+    title_menu->font(Font(TITLE_FONT_SIZE));
     title_frame->add(egt::expand_horizontal(egt::center(title_menu)));
 
     auto title_back = make_shared<ImageButton>(Image("back.png"));
-    title_back->set_boxtype(Theme::boxtype::none);
+    title_back->boxtype().clear();
     title_frame->add(left(egt::center(title_back)));
     title_back->on_click([this](Event&) { m_window.pop_page(); });
 
@@ -499,26 +499,26 @@ ModePage::ModePage(ThermostatWindow& window, Logic& logic)
     layout->add(expand(sizer));
 
     auto mode_auto = make_shared<ImageButton>(Image("auto.png"), _("Automatic"));
-    mode_auto->set_name("auto");
-    mode_auto->set_checked(settings().get("mode") == "auto");
+    mode_auto->name("auto");
+    mode_auto->checked(settings().get("mode") == "auto");
     selectable_btn_setup(mode_auto);
     sizer->add(mode_auto);
 
     auto mode_heating = make_shared<ImageButton>(Image("heat.png"), _("Heating"));
-    mode_heating->set_name("heat");
-    mode_heating->set_checked(settings().get("mode") == "heat");
+    mode_heating->name("heat");
+    mode_heating->checked(settings().get("mode") == "heat");
     selectable_btn_setup(mode_heating);
     sizer->add(mode_heating);
 
     auto mode_cooling = make_shared<ImageButton>(Image("cool.png"), _("Cooling"));
-    mode_cooling->set_name("cool");
-    mode_cooling->set_checked(settings().get("mode") == "cool");
+    mode_cooling->name("cool");
+    mode_cooling->checked(settings().get("mode") == "cool");
     selectable_btn_setup(mode_cooling);
     sizer->add(mode_cooling);
 
     auto mode_off = make_shared<ImageButton>(Image("off.png"), _("Off"));
-    mode_off->set_name("off");
-    mode_off->set_checked(settings().get("mode") == "off");
+    mode_off->name("off");
+    mode_off->checked(settings().get("mode") == "off");
     selectable_btn_setup(mode_off);
     sizer->add(mode_off);
 
@@ -557,15 +557,15 @@ FanPage::FanPage(ThermostatWindow& window, Logic& logic)
     layout->add(expand(sizer));
 
     auto mode_auto = make_shared<ImageButton>(Image("fan_auto.png"), _("Auto"));
-    mode_auto->set_name("auto");
+    mode_auto->name("auto");
     selectable_btn_setup(mode_auto);
-    mode_auto->set_checked(settings().get("fan") == "auto");
+    mode_auto->checked(settings().get("fan") == "auto");
     sizer->add(mode_auto);
 
     auto mode_off = make_shared<ImageButton>(Image("fan_on.png"), _("On"));
-    mode_off->set_name("on");
+    mode_off->name("on");
     selectable_btn_setup(mode_off);
-    mode_auto->set_checked(settings().get("fan") == "on");
+    mode_auto->checked(settings().get("fan") == "on");
     sizer->add(mode_off);
 
     m_button_group = detail::make_unique<ButtonGroup>(true, true);
@@ -595,16 +595,16 @@ IdleSettingsPage::IdleSettingsPage(ThermostatWindow& window, Logic& logic)
     auto layout = create_layout(_("Idle Mode"));
 
     auto sizer = make_shared<VerticalBoxSizer>();
-    sizer->set_margin(50);
+    sizer->margin(50);
     layout->add(expand(sizer));
 
     sizer->add(make_shared<Label>(_("Seconds idle before entering idle mode")));
 
     m_idle_timeout = std::make_shared<Slider>(10, 120,
                      std::stoi(settings().get("sleep_timeout")));
-    m_idle_timeout->set_height(100);
-    m_idle_timeout->set_align(alignmask::expand_horizontal);
-    m_idle_timeout->slider_flags().set({Slider::flag::round_handle, Slider::flag::show_label});
+    m_idle_timeout->height(100);
+    m_idle_timeout->align(AlignFlag::expand_horizontal);
+    m_idle_timeout->slider_flags().set({Slider::SliderFlag::round_handle, Slider::SliderFlag::show_label});
     sizer->add(m_idle_timeout);
 
     sizer->add(make_shared<Label>("Sleep screen brightness"));
@@ -612,9 +612,9 @@ IdleSettingsPage::IdleSettingsPage(ThermostatWindow& window, Logic& logic)
     m_sleep_brightness = std::make_shared<Slider>(3,
                          Application::instance().screen()->max_brightness(),
                          std::stoi(settings().get("sleep_brightness")));
-    m_sleep_brightness->set_height(100);
-    m_sleep_brightness->set_align(alignmask::expand_horizontal);
-    m_sleep_brightness->slider_flags().set({Slider::flag::round_handle, Slider::flag::show_label});
+    m_sleep_brightness->height(100);
+    m_sleep_brightness->align(AlignFlag::expand_horizontal);
+    m_sleep_brightness->slider_flags().set({Slider::SliderFlag::round_handle, Slider::SliderFlag::show_label});
     sizer->add(m_sleep_brightness);
 }
 
@@ -635,7 +635,7 @@ ScreenBrightnessPage::ScreenBrightnessPage(ThermostatWindow& window, Logic& logi
     auto layout = create_layout(_("Screen Brightness"));
 
     auto sizer = make_shared<VerticalBoxSizer>();
-    sizer->set_margin(50);
+    sizer->margin(50);
     layout->add(expand(sizer));
 
     sizer->add(make_shared<Label>(_("Screen brightness")));
@@ -643,30 +643,30 @@ ScreenBrightnessPage::ScreenBrightnessPage(ThermostatWindow& window, Logic& logi
     auto normal_brightness = std::make_shared<Slider>(3,
                              Application::instance().screen()->max_brightness(),
                              std::stoi(settings().get("normal_brightness")));
-    normal_brightness->set_height(100);
-    normal_brightness->set_align(alignmask::expand_horizontal);
-    normal_brightness->slider_flags().set({Slider::flag::round_handle, Slider::flag::show_label});
+    normal_brightness->height(100);
+    normal_brightness->align(AlignFlag::expand_horizontal);
+    normal_brightness->slider_flags().set({Slider::SliderFlag::round_handle, Slider::SliderFlag::show_label});
     sizer->add(normal_brightness);
 
     std::weak_ptr<Slider> weak_normal_brightness(normal_brightness);
-    normal_brightness->on_event([this, weak_normal_brightness](Event&)
+    normal_brightness->on_value_changed([this, weak_normal_brightness]()
     {
         auto normal_brightness = weak_normal_brightness.lock();
         if (normal_brightness)
         {
-            Application::instance().screen()->set_brightness(normal_brightness->value());
+            Application::instance().screen()->brightness(normal_brightness->value());
             settings().set("normal_brightness", std::to_string(normal_brightness->value()));
         }
-    }, {eventid::property_changed});
+    });
 }
 
 template<typename T, typename... Args>
 static std::shared_ptr<T> make_setup_button(Args&& ... args)
 {
     auto button = make_shared<T>(std::forward<Args>(args)...);
-    button->set_align(alignmask::expand);
-    button->set_image_align(alignmask::top);
-    button->set_color(Palette::ColorId::button_bg, Color(59, 70, 76));
+    button->align(AlignFlag::expand);
+    button->image_align(AlignFlag::top);
+    button->color(Palette::ColorId::button_bg, Color(59, 70, 76));
     return button;
 }
 
@@ -676,7 +676,7 @@ MenuPage::MenuPage(ThermostatWindow& window, Logic& logic)
     auto layout = create_layout(_("Menu"));
 
     auto grid = make_shared<StaticGrid>(std::make_tuple(4, 2));
-    grid->set_border(40);
+    grid->border(40);
     layout->add(expand(grid));
 
     auto time = make_setup_button<ImageButton>(Image("schedule.png"), _("Schedule"));
@@ -715,11 +715,11 @@ MenuPage::MenuPage(ThermostatWindow& window, Logic& logic)
     });
 
     auto wifi = make_setup_button<ImageButton>(Image("wifi.png"), _("Wi-Fi"));
-    wifi->set_disabled(true);
+    wifi->disabled(true);
     grid->add(wifi);
 
     auto hvac = make_setup_button<ImageButton>(Image("hvac.png"), _("HVAC\nEquipment"));
-    hvac->set_disabled(true);
+    hvac->disabled(true);
     grid->add(hvac);
 
     auto about = make_setup_button<ImageButton>(Image("about.png"), _("About\nThermostat"));
@@ -736,35 +736,35 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     auto layout = create_layout(_("Home Screen Content"));
 
     auto form = make_shared<Form>();
-    form->set_margin(50);
+    form->margin(50);
     layout->add(expand(form));
 
     m_showoutside = make_shared<ToggleBox>();
-    m_showoutside->set_boxtype(Theme::boxtype::border_rounded);
-    m_showoutside->set_toggle_text(_("Off"), _("On"));
-    m_showoutside->set_enable_disable(false);
-    m_showoutside->set_checked(settings().get("outside") == "on");
+    m_showoutside->boxtype(Theme::BoxFlag::border_rounded);
+    m_showoutside->toggle_text(_("Off"), _("On"));
+    m_showoutside->enable_disable(false);
+    m_showoutside->checked(settings().get("outside") == "on");
     form->add_option(_("Outside temp"), m_showoutside);
 
     m_degrees = make_shared<ToggleBox>();
-    m_degrees->set_boxtype(Theme::boxtype::border_rounded);
-    m_degrees->set_toggle_text(_("Fahrenheit"), _("Celsius"));
-    m_degrees->set_enable_disable(false);
-    m_degrees->set_checked(settings().get("degrees") == "c");
+    m_degrees->boxtype(Theme::BoxFlag::border_rounded);
+    m_degrees->toggle_text(_("Fahrenheit"), _("Celsius"));
+    m_degrees->enable_disable(false);
+    m_degrees->checked(settings().get("degrees") == "c");
     form->add_option(_("Display degrees"), m_degrees);
 
     m_usebackground = make_shared<ToggleBox>();
-    m_usebackground->set_boxtype(Theme::boxtype::border_rounded);
-    m_usebackground->set_toggle_text(_("Off"), _("On"));
-    m_usebackground->set_enable_disable(false);
-    m_usebackground->set_checked(settings().get("background") == "on");
+    m_usebackground->boxtype(Theme::BoxFlag::border_rounded);
+    m_usebackground->toggle_text(_("Off"), _("On"));
+    m_usebackground->enable_disable(false);
+    m_usebackground->checked(settings().get("background") == "on");
     form->add_option(_("Background Image"), m_usebackground);
 
     m_time_format = make_shared<ToggleBox>();
-    m_time_format->set_boxtype(Theme::boxtype::border_rounded);
-    m_time_format->set_toggle_text(_("12 Hour"), _("24 Hour"));
-    m_time_format->set_enable_disable(false);
-    m_time_format->set_checked(settings().get("time_format") == "24");
+    m_time_format->boxtype(Theme::BoxFlag::border_rounded);
+    m_time_format->toggle_text(_("12 Hour"), _("24 Hour"));
+    m_time_format->enable_disable(false);
+    m_time_format->checked(settings().get("time_format") == "24");
     form->add_option(_("Time format"), m_time_format);
 
 #if 0
@@ -774,8 +774,8 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     if (!timezones.empty())
     {
         auto timezone = std::make_shared<Scrollwheel>(timezones);
-        timezone->set_orient(orientation::horizontal);
-        timezone->set_image(Image("wheel_down.png"),  Image("wheel_up.png"));
+        timezone->orient(Orientation::horizontal);
+        timezone->image(Image("wheel_down.png"),  Image("wheel_up.png"));
         form->add_option(_("Timezone"), timezone);
     }
 #endif
@@ -823,10 +823,10 @@ SensorsPage::SensorsPage(ThermostatWindow& window, Logic& logic)
     {
         auto checkbox = std::make_shared<CheckBox>(sensor);
         if (settings().get("temp_sensor") == sensor)
-            checkbox->set_checked(true);
-        checkbox->set_align(alignmask::left);
-        checkbox->set_margin(5);
-        checkbox->set_name(sensor);
+            checkbox->checked(true);
+        checkbox->align(AlignFlag::left);
+        checkbox->margin(5);
+        checkbox->name(sensor);
         layout->add(checkbox);
         m_checkbox_group->add(checkbox);
     }
@@ -862,18 +862,18 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
     auto layout = create_layout(_("Schedule"));
 
     auto form = make_shared<Form>();
-    form->set_height(50);
-    form->set_boxtype(Theme::boxtype::fill);
-    form->set_color(Palette::ColorId::bg, Palette::gray);
+    form->height(50);
+    form->boxtype(Theme::BoxFlag::fill);
+    form->color(Palette::ColorId::bg, Palette::gray);
     layout->add(expand_horizontal(form));
 
     m_enabled = make_shared<ToggleBox>();
-    m_enabled->set_boxtype(Theme::boxtype::border_rounded);
-    m_enabled->set_margin(2);
-    m_enabled->set_toggle_text(_("Off"), _("On"));
-    m_enabled->set_enable_disable(false);
-    m_enabled->set_checked(settings().get("schedule_enabled") == "on");
-    form->set_name_align(alignmask::center);
+    m_enabled->boxtype(Theme::BoxFlag::border_rounded);
+    m_enabled->margin(2);
+    m_enabled->toggle_text(_("Off"), _("On"));
+    m_enabled->enable_disable(false);
+    m_enabled->checked(settings().get("schedule_enabled") == "on");
+    form->name_align(AlignFlag::center);
     form->add_option(_("Schedule Enabled"), m_enabled);
 
     auto grid = make_shared<StaticGrid>(std::make_tuple(3, 4));
@@ -908,8 +908,8 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
     {
         grid->add(expand(make_shared<ImageLabel>(Image(lowercase(name) + ".png"), name)));
         auto time1 = std::make_shared<Scrollwheel>(times, false);
-        time1->set_orient(orientation::horizontal);
-        time1->set_image(Image("wheel_down.png"),  Image("wheel_up.png"));
+        time1->orient(Orientation::horizontal);
+        time1->image(Image("wheel_down.png"),  Image("wheel_up.png"));
         grid->add(expand(time1));
 
         std::weak_ptr<Scrollwheel> weak_time1(time1);
@@ -918,14 +918,14 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
             auto time1 = weak_time1.lock();
             auto enabled = weak_enabled.lock();
             if (time1 && enabled)
-                time1->set_disabled(!enabled->checked());
+                time1->disabled(!enabled->checked());
         };
         time_invoke();
-        m_enabled->on_event([time_invoke](Event&) { time_invoke(); }, {eventid::property_changed});
+        m_enabled->on_checked_changed([time_invoke]() { time_invoke(); });
 
         auto temp1 = std::make_shared<Scrollwheel>(temps, false);
-        temp1->set_orient(orientation::horizontal);
-        temp1->set_image(Image("wheel_down.png"),  Image("wheel_up.png"));
+        temp1->orient(Orientation::horizontal);
+        temp1->image(Image("wheel_down.png"),  Image("wheel_up.png"));
         grid->add(expand(temp1));
 
         std::weak_ptr<Scrollwheel> weak_temp1(temp1);
@@ -934,10 +934,10 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
             auto temp1 = weak_temp1.lock();
             auto enabled = weak_enabled.lock();
             if (temp1 && enabled)
-                temp1->set_disabled(!enabled->checked());
+                temp1->disabled(!enabled->checked());
         };
         temp_invoke();
-        m_enabled->on_event([temp_invoke](Event&) { temp_invoke(); }, {eventid::property_changed});
+        m_enabled->on_checked_changed([temp_invoke]() { temp_invoke(); });
     }
 
     std::weak_ptr<StaticGrid> weak_grid(grid);
@@ -948,16 +948,16 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
         if (grid && enabled)
         {
             if (enabled->checked())
-                grid->set_alpha(1.0);
+                grid->alpha(1.0);
             else
-                grid->set_alpha(0.3);
+                grid->alpha(0.3);
         }
     };
     grid_invoke();
-    m_enabled->on_event([grid_invoke](Event & event)
+    m_enabled->on_checked_changed([grid_invoke]()
     {
         grid_invoke();
-    }, {eventid::property_changed});
+    });
 }
 
 bool SchedulePage::leave()
@@ -979,13 +979,13 @@ AboutPage::AboutPage(ThermostatWindow& window, Logic& logic)
     layout->add(egt::center(sizer));
 
     auto logo = std::make_shared<ImageButton>(Image("@128px/egt_logo_white.png"));
-    logo->set_boxtype(Theme::boxtype::none);
-    logo->set_margin(10);
+    logo->boxtype().clear();
+    logo->margin(10);
     sizer->add(logo);
 
     auto mlogo = std::make_shared<ImageButton>(Image("@128px/microchip_logo_white.png"));
-    mlogo->set_boxtype(Theme::boxtype::none);
-    mlogo->set_margin(10);
+    mlogo->boxtype().clear();
+    mlogo->margin(10);
     sizer->add(mlogo);
 
     // TODO: i18n support
@@ -1003,12 +1003,12 @@ AboutPage::AboutPage(ThermostatWindow& window, Logic& logic)
                     "\n"
                     "Source code available at: https://github.com/linux4sam/egt-thermostat\n"
                 );
-    text->set_readonly(true);
-    text->set_margin(20);
-    text->text_flags().set({TextBox::flag::multiline, TextBox::flag::word_wrap});
-    text->set_border(0);
-    text->set_color(Palette::ColorId::text, Palette::white);
-    text->set_color(Palette::ColorId::bg, Palette::transparent);
+    text->readonly(true);
+    text->margin(20);
+    text->text_flags().set({TextBox::TextFlag::multiline, TextBox::TextFlag::word_wrap});
+    text->border(0);
+    text->color(Palette::ColorId::text, Palette::white);
+    text->color(Palette::ColorId::bg, Palette::transparent);
 
     layout->add(expand(text));
 }

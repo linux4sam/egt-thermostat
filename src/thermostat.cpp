@@ -127,6 +127,7 @@ int main(int argc, const char** argv)
     {
         update_time(win);
     });
+    time_timer.start();
 
     // update temp sensors periodically
     win.m_logic.change_current(get_temp_sensor(settings().get("temp_sensor")));

@@ -3,16 +3,22 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include "pages.h"
 #include "logic.h"
+#include "pages.h"
 #include "sensors.h"
 #include "settings.h"
 #include "window.h"
 #include <iomanip>
+#include <libintl.h>
 
 using namespace egt;
 using namespace egt::experimental;
 using namespace std;
+
+/**
+ * This is a wrapper around gettext().
+ */
+#define _(String) gettext(String)
 
 template<class T>
 constexpr static inline T f2c(T f)
@@ -36,7 +42,7 @@ static void selectable_btn_setup(const shared_ptr<ImageButton>& button)
     button->color(Palette::ColorId::button_bg, Color(0, 255, 255, 30), Palette::GroupId::checked);
     button->color(Palette::ColorId::button_bg, Palette::transparent, Palette::GroupId::active);
     button->color(Palette::ColorId::border, Palette::transparent);
-    button->boxtype(Theme::BoxFlag::fill);
+    button->fill_flags(Theme::FillFlag::blend);
     button->border(2);
     button->margin(5);
     button->padding(10);
@@ -79,7 +85,7 @@ IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
     leftbox->add(egt::center(m_otemp));
 
     auto logo = std::make_shared<ImageButton>(Image("@128px/egt_logo_white.png"));
-    logo->boxtype().clear();
+    logo->fill_flags().clear();
     logo->align(AlignFlag::center | AlignFlag::bottom);
     logo->margin(10);
     add(logo);
@@ -179,7 +185,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     : ThermostatPage(window, logic)
 {
     m_menu = make_shared<ImageButton>(Image("menu.png"));
-    m_menu->boxtype().clear();
+    m_menu->fill_flags().clear();
     m_menu->padding(0);
     m_menu->move(Point(0, 20));
     add(m_menu);
@@ -233,7 +239,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
         button->color(Palette::ColorId::button_bg, Palette::transparent);
         button->color(Palette::ColorId::button_bg, Palette::transparent, Palette::GroupId::active);
         button->color(Palette::ColorId::border, Palette::transparent);
-        button->boxtype().clear();
+        button->fill_flags().clear();
     };
 
     auto up = make_shared<ImageButton>(Image("up.png"));
@@ -309,7 +315,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
 
     m_mode = make_shared<ImageButton>();
     m_mode->padding(10);
-    m_mode->boxtype(Theme::BoxFlag::fill);
+    m_mode->fill_flags(Theme::FillFlag::blend);
     m_mode->image_align(AlignFlag::center | AlignFlag::left);
     m_mode->color(Palette::ColorId::button_bg, Color(255, 255, 255, 75));
     m_mode->color(Palette::ColorId::button_bg, Color(Palette::cyan, 75), Palette::GroupId::active);
@@ -328,7 +334,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
 
     m_fan = make_shared<ImageButton>();
     m_fan->padding(10);
-    m_fan->boxtype(Theme::BoxFlag::fill);
+    m_fan->fill_flags(Theme::FillFlag::blend);
     m_fan->image_align(AlignFlag::center | AlignFlag::left);
     m_fan->color(Palette::ColorId::button_bg, Color(255, 255, 255, 75));
     m_fan->color(Palette::ColorId::button_bg, Color(Palette::cyan, 75), Palette::GroupId::active);
@@ -346,7 +352,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     auto camera_button = make_shared<Button>();
     camera_button->box(Rect(Point(m_menu->width() + 10, 10), m_camera->size() / 2));
     add(camera_button);
-    camera_button->boxtype().clear();
+    camera_button->fill_flags().clear();
     camera_button->on_event([this](Event & event)
     {
         if (!m_camera_fullscreen)
@@ -393,14 +399,14 @@ void MainPage::enter()
     if (settings().get("background") == "on")
     {
         m_window.background(Image("background" + std::to_string(m_background_index) + ".png"));
-        boxtype().clear();
+        fill_flags().clear();
         m_background_timer.start();
     }
     else
     {
         m_background_timer.stop();
         m_window.background(Image());
-        boxtype(Theme::BoxFlag::fill);
+        fill_flags(Theme::FillFlag::blend);
     }
 
     if (settings().get("outside") == "on")
@@ -473,7 +479,7 @@ std::shared_ptr<VerticalBoxSizer> SettingsPage::create_layout(const std::string&
     add(expand(layout));
 
     auto title_frame = make_shared<Frame>();
-    title_frame->boxtype(Theme::BoxFlag::fill);
+    title_frame->fill_flags(Theme::FillFlag::blend);
     title_frame->color(Palette::ColorId::bg, Color(55, 71, 79));
     title_frame->height(50);
     layout->add(expand_horizontal(title_frame));
@@ -483,7 +489,7 @@ std::shared_ptr<VerticalBoxSizer> SettingsPage::create_layout(const std::string&
     title_frame->add(egt::expand_horizontal(egt::center(title_menu)));
 
     auto title_back = make_shared<ImageButton>(Image("back.png"));
-    title_back->boxtype().clear();
+    title_back->fill_flags().clear();
     title_frame->add(left(egt::center(title_back)));
     title_back->on_click([this](Event&) { m_window.pop_page(); });
 
@@ -740,28 +746,28 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     layout->add(expand(form));
 
     m_showoutside = make_shared<ToggleBox>();
-    m_showoutside->boxtype(Theme::BoxFlag::border_rounded);
+    m_showoutside->border_radius(4.0);
     m_showoutside->toggle_text(_("Off"), _("On"));
     m_showoutside->enable_disable(false);
     m_showoutside->checked(settings().get("outside") == "on");
     form->add_option(_("Outside temp"), m_showoutside);
 
     m_degrees = make_shared<ToggleBox>();
-    m_degrees->boxtype(Theme::BoxFlag::border_rounded);
+    m_degrees->border_radius(4.0);
     m_degrees->toggle_text(_("Fahrenheit"), _("Celsius"));
     m_degrees->enable_disable(false);
     m_degrees->checked(settings().get("degrees") == "c");
     form->add_option(_("Display degrees"), m_degrees);
 
     m_usebackground = make_shared<ToggleBox>();
-    m_usebackground->boxtype(Theme::BoxFlag::border_rounded);
+    m_usebackground->border_radius(4.0);
     m_usebackground->toggle_text(_("Off"), _("On"));
     m_usebackground->enable_disable(false);
     m_usebackground->checked(settings().get("background") == "on");
     form->add_option(_("Background Image"), m_usebackground);
 
     m_time_format = make_shared<ToggleBox>();
-    m_time_format->boxtype(Theme::BoxFlag::border_rounded);
+    m_time_format->border_radius(4.0);
     m_time_format->toggle_text(_("12 Hour"), _("24 Hour"));
     m_time_format->enable_disable(false);
     m_time_format->checked(settings().get("time_format") == "24");
@@ -863,12 +869,12 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
 
     auto form = make_shared<Form>();
     form->height(50);
-    form->boxtype(Theme::BoxFlag::fill);
+    form->fill_flags(Theme::FillFlag::blend);
     form->color(Palette::ColorId::bg, Palette::gray);
     layout->add(expand_horizontal(form));
 
     m_enabled = make_shared<ToggleBox>();
-    m_enabled->boxtype(Theme::BoxFlag::border_rounded);
+    m_enabled->border_radius(4.0);
     m_enabled->margin(2);
     m_enabled->toggle_text(_("Off"), _("On"));
     m_enabled->enable_disable(false);
@@ -979,12 +985,12 @@ AboutPage::AboutPage(ThermostatWindow& window, Logic& logic)
     layout->add(egt::center(sizer));
 
     auto logo = std::make_shared<ImageButton>(Image("@128px/egt_logo_white.png"));
-    logo->boxtype().clear();
+    logo->fill_flags().clear();
     logo->margin(10);
     sizer->add(logo);
 
     auto mlogo = std::make_shared<ImageButton>(Image("@128px/microchip_logo_white.png"));
-    mlogo->boxtype().clear();
+    mlogo->fill_flags().clear();
     mlogo->margin(10);
     sizer->add(mlogo);
 

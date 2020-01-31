@@ -22,6 +22,8 @@ CFLAGS="$CFLAGS -g"
 AX_PTHREAD([LIBS="$PTHREAD_LIBS $LIBS"
             CFLAGS="$CFLAGS $PTHREAD_CFLAGS"], AC_MSG_ERROR(Can not find pthreads.  This is required.))
 
+AC_LANG(C++)
+
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP

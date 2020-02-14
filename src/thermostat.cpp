@@ -58,7 +58,7 @@ static void update_time(ThermostatWindow& win)
         l4->text(current_time());
 }
 
-int main(int argc, const char** argv)
+int main(int argc, char** argv)
 {
     Application app(argc, argv);
 

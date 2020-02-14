@@ -16,7 +16,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 LT_PREREQ([2.2])
 LT_INIT([win32-dll])
 
-CXXFLAGS="$CXXFLAGS -std=c++11 -pedantic -g"
+CXXFLAGS="$CXXFLAGS -std=c++14 -pedantic -g"
 CFLAGS="$CFLAGS -g"
 
 AX_PTHREAD([LIBS="$PTHREAD_LIBS $LIBS"

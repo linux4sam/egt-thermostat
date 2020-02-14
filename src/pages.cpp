@@ -528,7 +528,7 @@ ModePage::ModePage(ThermostatWindow& window, Logic& logic)
     selectable_btn_setup(mode_off);
     sizer->add(mode_off);
 
-    m_button_group = detail::make_unique<ButtonGroup>(true, true);
+    m_button_group = std::make_unique<ButtonGroup>(true, true);
     m_button_group->add(mode_auto);
     m_button_group->add(mode_heating);
     m_button_group->add(mode_cooling);
@@ -574,7 +574,7 @@ FanPage::FanPage(ThermostatWindow& window, Logic& logic)
     mode_auto->checked(settings().get("fan") == "on");
     sizer->add(mode_off);
 
-    m_button_group = detail::make_unique<ButtonGroup>(true, true);
+    m_button_group = std::make_unique<ButtonGroup>(true, true);
     m_button_group->add(mode_auto);
     m_button_group->add(mode_off);
 }
@@ -822,7 +822,7 @@ SensorsPage::SensorsPage(ThermostatWindow& window, Logic& logic)
 
     layout->add(make_shared<Label>(_("Select the sensor to use for internal temperature")));
 
-    m_checkbox_group = detail::make_unique<ButtonGroup>(true, true);
+    m_checkbox_group = std::make_unique<ButtonGroup>(true, true);
 
     const auto sensors = enumerate_temp_sensors();
     for (const auto& sensor : sensors)

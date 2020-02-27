@@ -79,12 +79,12 @@ IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
     time->name("time_label1");
     leftbox->add(egt::center(time));
 
-    m_otemp = make_shared<ImageLabel>(Image("02d.png"), "Outside");
+    m_otemp = make_shared<ImageLabel>(Image("file:02d.png"), "Outside");
     m_otemp->font(Font(16));
     m_otemp->image_align(AlignFlag::center | AlignFlag::top);
     leftbox->add(egt::center(m_otemp));
 
-    auto logo = std::make_shared<ImageButton>(Image("@128px/egt_logo_white.png"));
+    auto logo = std::make_shared<ImageButton>(Image("icon:egt_logo_white.png;128"));
     logo->fill_flags().clear();
     logo->align(AlignFlag::center | AlignFlag::bottom);
     logo->margin(10);
@@ -184,7 +184,7 @@ class TempLabel : public Label
 MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     : ThermostatPage(window, logic)
 {
-    m_menu = make_shared<ImageButton>(Image("menu.png"));
+    m_menu = make_shared<ImageButton>(Image("file:menu.png"));
     m_menu->fill_flags().clear();
     m_menu->padding(0);
     m_menu->move(Point(0, 20));
@@ -211,7 +211,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     time->name("time_label2");
     leftbox->add(egt::center(time));
 
-    m_otemp = make_shared<ImageLabel>(Image("02d.png"), "Outside");
+    m_otemp = make_shared<ImageLabel>(Image("file:02d.png"), "Outside");
     m_otemp->font(Font(16));
     m_otemp->image_align(AlignFlag::center | AlignFlag::top);
     leftbox->add(egt::center(m_otemp));
@@ -242,11 +242,11 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
         button->fill_flags().clear();
     };
 
-    auto up = make_shared<ImageButton>(Image("up.png"));
+    auto up = make_shared<ImageButton>(Image("file:up.png"));
     btn_setup(up);
     m_layout->add(up);
-    m_layout->add(make_shared<ImageLabel>(Image("dots.png")));
-    auto down = make_shared<ImageButton>(Image("down.png"));
+    m_layout->add(make_shared<ImageLabel>(Image("file:dots.png")));
+    auto down = make_shared<ImageButton>(Image("file:down.png"));
     btn_setup(down);
     m_layout->add(down);
 
@@ -259,10 +259,10 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
             switch (event.id())
             {
             case EventId::raw_pointer_down:
-                up->image(Image("up2.png"));
+                up->image(Image("file:up2.png"));
                 break;
             case EventId::raw_pointer_up:
-                up->image(Image("up.png"));
+                up->image(Image("file:up.png"));
                 break;
             case EventId::pointer_click:
             case EventId::pointer_hold:
@@ -286,10 +286,10 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
             switch (event.id())
             {
             case EventId::raw_pointer_down:
-                down->image(Image("down2.png"));
+                down->image(Image("file:down2.png"));
                 break;
             case EventId::raw_pointer_up:
-                down->image(Image("down.png"));
+                down->image(Image("file:down.png"));
                 break;
             case EventId::pointer_click:
             case EventId::pointer_hold:
@@ -370,7 +370,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
 
     m_background_timer.on_timeout([this]()
     {
-        m_window.background(Image("background" + std::to_string(m_background_index) + ".png"));
+        m_window.background(Image("file:background" + std::to_string(m_background_index) + ".png"));
         if (++m_background_index > 5)
             m_background_index = 0;
     });
@@ -398,7 +398,7 @@ void MainPage::enter()
 {
     if (settings().get("background") == "on")
     {
-        m_window.background(Image("background" + std::to_string(m_background_index) + ".png"));
+        m_window.background(Image("file:background" + std::to_string(m_background_index) + ".png"));
         fill_flags().clear();
         m_background_timer.start();
     }
@@ -423,10 +423,10 @@ void MainPage::enter()
 
     auto mode = settings().get("mode");
     m_mode->text(string("System ") + capitalize(mode));
-    m_mode->image(Image(mode + ".png", 0.3));
+    m_mode->image(Image("file:" + mode + ".png", 0.3));
     auto fan = settings().get("fan");
     m_fan->text(string("Fan ") + capitalize(fan));
-    m_fan->image(Image("fan_" + fan + ".png", 0.3));
+    m_fan->image(Image("file:fan_" + fan + ".png", 0.3));
 
     if (m_camera->start())
         m_camera->show();
@@ -488,7 +488,7 @@ std::shared_ptr<VerticalBoxSizer> SettingsPage::create_layout(const std::string&
     title_menu->font(Font(TITLE_FONT_SIZE));
     title_frame->add(egt::expand_horizontal(egt::center(title_menu)));
 
-    auto title_back = make_shared<ImageButton>(Image("back.png"));
+    auto title_back = make_shared<ImageButton>(Image("file:back.png"));
     title_back->fill_flags().clear();
     title_frame->add(left(egt::center(title_back)));
     title_back->on_click([this](Event&) { m_window.pop_page(); });
@@ -504,25 +504,25 @@ ModePage::ModePage(ThermostatWindow& window, Logic& logic)
     auto sizer = make_shared<HorizontalBoxSizer>();
     layout->add(expand(sizer));
 
-    auto mode_auto = make_shared<ImageButton>(Image("auto.png"), _("Automatic"));
+    auto mode_auto = make_shared<ImageButton>(Image("file:auto.png"), _("Automatic"));
     mode_auto->name("auto");
     mode_auto->checked(settings().get("mode") == "auto");
     selectable_btn_setup(mode_auto);
     sizer->add(mode_auto);
 
-    auto mode_heating = make_shared<ImageButton>(Image("heat.png"), _("Heating"));
+    auto mode_heating = make_shared<ImageButton>(Image("file:heat.png"), _("Heating"));
     mode_heating->name("heat");
     mode_heating->checked(settings().get("mode") == "heat");
     selectable_btn_setup(mode_heating);
     sizer->add(mode_heating);
 
-    auto mode_cooling = make_shared<ImageButton>(Image("cool.png"), _("Cooling"));
+    auto mode_cooling = make_shared<ImageButton>(Image("file:cool.png"), _("Cooling"));
     mode_cooling->name("cool");
     mode_cooling->checked(settings().get("mode") == "cool");
     selectable_btn_setup(mode_cooling);
     sizer->add(mode_cooling);
 
-    auto mode_off = make_shared<ImageButton>(Image("off.png"), _("Off"));
+    auto mode_off = make_shared<ImageButton>(Image("file:off.png"), _("Off"));
     mode_off->name("off");
     mode_off->checked(settings().get("mode") == "off");
     selectable_btn_setup(mode_off);
@@ -562,13 +562,13 @@ FanPage::FanPage(ThermostatWindow& window, Logic& logic)
     auto sizer = make_shared<HorizontalBoxSizer>();
     layout->add(expand(sizer));
 
-    auto mode_auto = make_shared<ImageButton>(Image("fan_auto.png"), _("Auto"));
+    auto mode_auto = make_shared<ImageButton>(Image("file:fan_auto.png"), _("Auto"));
     mode_auto->name("auto");
     selectable_btn_setup(mode_auto);
     mode_auto->checked(settings().get("fan") == "auto");
     sizer->add(mode_auto);
 
-    auto mode_off = make_shared<ImageButton>(Image("fan_on.png"), _("On"));
+    auto mode_off = make_shared<ImageButton>(Image("file:fan_on.png"), _("On"));
     mode_off->name("on");
     selectable_btn_setup(mode_off);
     mode_auto->checked(settings().get("fan") == "on");
@@ -685,50 +685,50 @@ MenuPage::MenuPage(ThermostatWindow& window, Logic& logic)
     grid->border(40);
     layout->add(expand(grid));
 
-    auto time = make_setup_button<ImageButton>(Image("schedule.png"), _("Schedule"));
+    auto time = make_setup_button<ImageButton>(Image("file:schedule.png"), _("Schedule"));
     grid->add(time);
     time->on_click([this](Event&)
     {
         m_window.push_page("schedule");
     });
 
-    auto sleep_mode = make_setup_button<ImageButton>(Image("sleep.png"), _("Idle Mode"));
+    auto sleep_mode = make_setup_button<ImageButton>(Image("file:sleep.png"), _("Idle Mode"));
     grid->add(sleep_mode);
     sleep_mode->on_click([this](Event&)
     {
         m_window.push_page("idlesettings");
     });
 
-    auto screen_brightness = make_setup_button<ImageButton>(Image("brightness.png"), _("Screen\nBrightness"));
+    auto screen_brightness = make_setup_button<ImageButton>(Image("file:brightness.png"), _("Screen\nBrightness"));
     grid->add(screen_brightness);
     screen_brightness->on_click([this](Event&)
     {
         m_window.push_page("screenbrightness");
     });
 
-    auto home_content = make_setup_button<ImageButton>(Image("home.png"), _("Home Screen\nContent"));
+    auto home_content = make_setup_button<ImageButton>(Image("file:home.png"), _("Home Screen\nContent"));
     grid->add(home_content);
     home_content->on_click([this](Event&)
     {
         m_window.push_page("homecontent");
     });
 
-    auto sensors = make_setup_button<ImageButton>(Image("sensors.png"), _("Sensors"));
+    auto sensors = make_setup_button<ImageButton>(Image("file:sensors.png"), _("Sensors"));
     grid->add(sensors);
     sensors->on_click([this](Event&)
     {
         m_window.push_page("sensors");
     });
 
-    auto wifi = make_setup_button<ImageButton>(Image("wifi.png"), _("Wi-Fi"));
+    auto wifi = make_setup_button<ImageButton>(Image("file:wifi.png"), _("Wi-Fi"));
     wifi->disabled(true);
     grid->add(wifi);
 
-    auto hvac = make_setup_button<ImageButton>(Image("hvac.png"), _("HVAC\nEquipment"));
+    auto hvac = make_setup_button<ImageButton>(Image("file:hvac.png"), _("HVAC\nEquipment"));
     hvac->disabled(true);
     grid->add(hvac);
 
-    auto about = make_setup_button<ImageButton>(Image("about.png"), _("About\nThermostat"));
+    auto about = make_setup_button<ImageButton>(Image("file:about.png"), _("About\nThermostat"));
     grid->add(about);
     about->on_click([this](Event&)
     {
@@ -781,7 +781,7 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     {
         auto timezone = std::make_shared<Scrollwheel>(timezones);
         timezone->orient(Orientation::horizontal);
-        timezone->image(Image("wheel_down.png"),  Image("wheel_up.png"));
+        timezone->image(Image("file:wheel_down.png"),  Image("file:wheel_up.png"));
         form->add_option(_("Timezone"), timezone);
     }
 #endif
@@ -912,10 +912,10 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
 
     for (auto& name : names)
     {
-        grid->add(expand(make_shared<ImageLabel>(Image(lowercase(name) + ".png"), name)));
+        grid->add(expand(make_shared<ImageLabel>(Image("file:" + lowercase(name) + ".png"), name)));
         auto time1 = std::make_shared<Scrollwheel>(times, false);
         time1->orient(Orientation::horizontal);
-        time1->image(Image("wheel_down.png"),  Image("wheel_up.png"));
+        time1->image(Image("file:wheel_down.png"),  Image("file:wheel_up.png"));
         grid->add(expand(time1));
 
         std::weak_ptr<Scrollwheel> weak_time1(time1);
@@ -931,7 +931,7 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
 
         auto temp1 = std::make_shared<Scrollwheel>(temps, false);
         temp1->orient(Orientation::horizontal);
-        temp1->image(Image("wheel_down.png"),  Image("wheel_up.png"));
+        temp1->image(Image("file:wheel_down.png"),  Image("file:wheel_up.png"));
         grid->add(expand(temp1));
 
         std::weak_ptr<Scrollwheel> weak_temp1(temp1);
@@ -984,12 +984,12 @@ AboutPage::AboutPage(ThermostatWindow& window, Logic& logic)
     auto sizer = make_shared<HorizontalBoxSizer>();
     layout->add(egt::center(sizer));
 
-    auto logo = std::make_shared<ImageButton>(Image("@128px/egt_logo_white.png"));
+    auto logo = std::make_shared<ImageButton>(Image("icon:egt_logo_white.png;128"));
     logo->fill_flags().clear();
     logo->margin(10);
     sizer->add(logo);
 
-    auto mlogo = std::make_shared<ImageButton>(Image("@128px/microchip_logo_white.png"));
+    auto mlogo = std::make_shared<ImageButton>(Image("icon:microchip_logo_white.png;128"));
     mlogo->fill_flags().clear();
     mlogo->margin(10);
     sizer->add(mlogo);

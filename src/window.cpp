@@ -61,7 +61,6 @@ ThermostatWindow::ThermostatWindow()
     // on any input, reset idle timer
     m_handle = Input::global_input().on_event([this, main_page](Event & event)
     {
-        main_page->shrink_camera();
         m_screen_brightness_timer.cancel();
         auto screen = Application::instance().screen();
         screen->brightness(std::stoi(settings().get("normal_brightness")));
@@ -71,6 +70,12 @@ ThermostatWindow::ThermostatWindow()
         EventId::raw_pointer_move,
         EventId::pointer_hold
        });
+
+    // on any click, shrink camera
+    m_handle = Input::global_input().on_event([this, main_page](Event & event)
+    {
+        main_page->shrink_camera();
+    }, {EventId::pointer_click});
 
     m_logic.on_change([this]()
     {

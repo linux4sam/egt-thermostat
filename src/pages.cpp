@@ -91,7 +91,7 @@ IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
     add(logo);
 
     auto hsizer = make_shared<BoxSizer>(Orientation::vertical);
-    hsizer->align(AlignFlag::center);
+    hsizer->align(AlignFlag::center | AlignFlag::expand_horizontal);
     add(hsizer);
 
     m_temp = make_shared<Label>();
@@ -217,7 +217,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     leftbox->add(egt::center(m_otemp));
 
     auto hsizer = make_shared<BoxSizer>(Orientation::vertical);
-    hsizer->align(AlignFlag::center);
+    hsizer->align(AlignFlag::center | AlignFlag::expand_horizontal);
     add(hsizer);
 
     m_temp = make_shared<TempLabel>();

@@ -537,6 +537,8 @@ ModePage::ModePage(ThermostatWindow& window, Logic& logic)
 
 bool ModePage::leave()
 {
+    Settings::AutoTransaction tx(settings());
+
     m_button_group->foreach_checked([this](Button & button)
     {
         settings().set("mode", button.name());
@@ -581,6 +583,8 @@ FanPage::FanPage(ThermostatWindow& window, Logic& logic)
 
 bool FanPage::leave()
 {
+    Settings::AutoTransaction tx(settings());
+
     m_button_group->foreach_checked([this](Button & button)
     {
         settings().set("fan", button.name());
@@ -626,6 +630,8 @@ IdleSettingsPage::IdleSettingsPage(ThermostatWindow& window, Logic& logic)
 
 bool IdleSettingsPage::leave()
 {
+    Settings::AutoTransaction tx(settings());
+
     settings().set("sleep_brightness", std::to_string(m_sleep_brightness->value()));
     settings().set("sleep_timeout", std::to_string(m_idle_timeout->value()));
 
@@ -789,6 +795,8 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
 
 bool HomeContentPage::leave()
 {
+    Settings::AutoTransaction tx(settings());
+
     if (m_degrees->checked())
         settings().set("degrees", "c");
     else
@@ -968,6 +976,8 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
 
 bool SchedulePage::leave()
 {
+    Settings::AutoTransaction tx(settings());
+
     if (m_enabled->checked())
         settings().set("schedule_enabled", "on");
     else

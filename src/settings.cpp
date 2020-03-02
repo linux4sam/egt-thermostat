@@ -31,7 +31,10 @@ struct Settings::settings_impl
 
 Settings::Settings()
     : m_impl(new settings_impl)
-{}
+{
+    // store temp tables in memory
+    m_impl->db.execute("PRAGMA temp_store = MEMORY");
+}
 
 void Settings::set_default_callback(default_value_callback_t callback)
 {
@@ -97,6 +100,16 @@ void Settings::status_log(Logic::status status, bool fan)
     long long int since_epoch = std::chrono::steady_clock::now().time_since_epoch().count();
     cmd.bind(":datetime", since_epoch);
     cmd.execute();
+}
+
+void Settings::begin_tx()
+{
+    m_impl->db.execute("BEGIN");
+}
+
+void Settings::end_tx()
+{
+    m_impl->db.execute("COMMIT");
 }
 
 Settings& settings()

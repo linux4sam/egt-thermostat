@@ -36,6 +36,8 @@ void Logic::change_target(float value)
 {
     if (egt::detail::change_if_diff<>(m_target, value))
     {
+        Settings::AutoTransaction tx(settings());
+
         settings().set("target_temp", std::to_string(m_target));
 
         process();
@@ -47,6 +49,8 @@ void Logic::change_current(float value)
 {
     if (egt::detail::change_if_diff<>(m_current, value))
     {
+        Settings::AutoTransaction tx(settings());
+
         process();
         on_change.invoke();
     }

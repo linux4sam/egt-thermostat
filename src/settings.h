@@ -14,6 +14,23 @@
 
 struct Settings : private egt::detail::NonCopyable<Settings>
 {
+    /// this does not currently support nesting of transactions
+    struct AutoTransaction
+    {
+        explicit AutoTransaction(Settings& settings)
+            : m_settings(settings)
+        {
+            m_settings.begin_tx();
+        }
+
+        ~AutoTransaction()
+        {
+            m_settings.end_tx();
+        }
+
+        Settings& m_settings;
+    };
+
     using default_value_callback_t = std::function<std::string(const std::string&)>;
 
     Settings();
@@ -25,6 +42,9 @@ struct Settings : private egt::detail::NonCopyable<Settings>
 
     void temp_log(float temp);
     void status_log(Logic::status status, bool fan);
+
+    void begin_tx();
+    void end_tx();
 
     struct settings_impl;
     std::unique_ptr<settings_impl> m_impl;

@@ -34,6 +34,8 @@ public:
         heating,
     };
 
+
+    /// @note Do not start a settings transaction on callback, one is already started.
     egt::detail::Signal<> on_change;
 
     Logic();

@@ -65,6 +65,9 @@ int main(int argc, char** argv)
     add_search_path(DATADIR "/egt/thermostat/");
     add_search_path("./images");
 
+    global_theme().palette().set(Palette::ColorId::bg, Color(38, 50, 56));
+    global_theme().palette().set(Palette::ColorId::bg, Color(38, 50, 56), Palette::GroupId::checked);
+    global_theme().palette().set(Palette::ColorId::bg, Color(38, 50, 56), Palette::GroupId::active);
     global_theme().palette().set(Palette::ColorId::label_text, Palette::white);
     global_theme().palette().set(Palette::ColorId::label_text, Palette::cyan, Palette::GroupId::active);
     global_theme().palette().set(Palette::ColorId::label_text, Palette::cyan, Palette::GroupId::checked);

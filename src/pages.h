@@ -16,9 +16,7 @@ struct ThermostatPage : public egt::NotebookTab
     ThermostatPage(ThermostatWindow& window, Logic& logic)
         : m_window(window),
           m_logic(logic)
-    {
-        color(egt::Palette::ColorId::bg, egt::Color(38, 50, 56));
-    }
+    {}
 
     virtual ~ThermostatPage() = default;
 

@@ -672,7 +672,7 @@ ScreenBrightnessPage::ScreenBrightnessPage(ThermostatWindow& window, Logic& logi
     sizer->add(normal_brightness);
 
     std::weak_ptr<Slider> weak_normal_brightness(normal_brightness);
-    normal_brightness->on_value_changed([this, weak_normal_brightness]()
+    normal_brightness->on_value_changed([weak_normal_brightness]()
     {
         auto normal_brightness = weak_normal_brightness.lock();
         if (normal_brightness)
@@ -859,7 +859,7 @@ SensorsPage::SensorsPage(ThermostatWindow& window, Logic& logic)
 
 bool SensorsPage::leave()
 {
-    m_checkbox_group->foreach_checked([this](Button & button)
+    m_checkbox_group->foreach_checked([](Button & button)
     {
         settings().set("temp_sensor", button.name());
     });

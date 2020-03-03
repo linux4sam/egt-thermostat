@@ -436,6 +436,9 @@ void MainPage::enter()
     if (m_camera->start())
         m_camera->show();
 #endif
+
+    // hack
+    m_logic.refresh();
 }
 
 bool MainPage::leave()

@@ -345,6 +345,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
         m_window.push_page("fan");
     });
 
+#ifdef EGT_HAS_CAMERA
     m_camera = make_shared<CameraWindow>(Size(320, 240));
     shrink_camera();
     add(m_camera);
@@ -367,6 +368,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     {
         m_camera->hide();
     });
+#endif
 
     m_background_timer.on_timeout([this]()
     {
@@ -388,8 +390,10 @@ void MainPage::shrink_camera()
 {
     if (m_camera_fullscreen)
     {
-        m_camera->move(Point(m_menu->width() + 10, 10));
-        m_camera->scale(.5, .5);
+#ifdef EGT_HAS_CAMERA
+	m_camera->scale(.5, .5);
+	m_camera->move(Point(m_menu->width() + 10, 10));
+#endif
         m_camera_fullscreen = false;
     }
 }
@@ -428,15 +432,19 @@ void MainPage::enter()
     m_fan->text(string("Fan ") + capitalize(fan));
     m_fan->image(Image("file:fan_" + fan + ".png", 0.3));
 
+#ifdef EGT_HAS_CAMERA
     if (m_camera->start())
         m_camera->show();
+#endif
 }
 
 bool MainPage::leave()
 {
+#ifdef EGT_HAS_CAMERA
     shrink_camera();
     m_camera->stop();
     m_camera->hide();
+#endif
     return true;
 }
 

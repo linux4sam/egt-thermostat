@@ -55,7 +55,9 @@ struct MainPage : public ThermostatPage
     std::shared_ptr<egt::ImageButton> m_mode;
     std::shared_ptr<egt::ImageButton> m_fan;
     std::shared_ptr<egt::VerticalBoxSizer> m_layout;
+#ifdef EGT_HAS_CAMERA
     std::shared_ptr<egt::CameraWindow> m_camera;
+#endif
     std::shared_ptr<egt::ImageLabel> m_otemp;
     bool m_camera_fullscreen{true};
     egt::PeriodicTimer m_background_timer{std::chrono::seconds(5)};

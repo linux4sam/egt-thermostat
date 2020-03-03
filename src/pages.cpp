@@ -349,11 +349,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     shrink_camera();
     add(m_camera);
 
-    auto camera_button = make_shared<Button>();
-    camera_button->box(Rect(Point(m_menu->width() + 10, 10), m_camera->size() / 2));
-    add(camera_button);
-    camera_button->fill_flags().clear();
-    camera_button->on_click([this](Event & event)
+    m_camera->on_event([this](Event & event)
     {
         if (!m_camera_fullscreen)
         {
@@ -361,7 +357,11 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
             m_camera->scale(2.5, 2.5);
             m_camera_fullscreen = true;
         }
-    });
+	else
+	{
+	    shrink_camera();
+	}
+    }, {EventId::pointer_click});
 
     m_camera->on_error([this]()
     {

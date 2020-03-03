@@ -71,12 +71,6 @@ ThermostatWindow::ThermostatWindow()
         EventId::pointer_hold
        });
 
-    // on any click, shrink camera
-    m_handle = Input::global_input().on_event([this, main_page](Event & event)
-    {
-        main_page->shrink_camera();
-    }, {EventId::pointer_click});
-
     m_logic.on_change([this]()
     {
         settings().status_log(m_logic.current_status(), m_logic.current_fan_status());

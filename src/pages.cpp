@@ -9,6 +9,7 @@
 #include "settings.h"
 #include "window.h"
 #include <iomanip>
+#include <iostream>
 #include <libintl.h>
 
 using namespace egt;
@@ -364,8 +365,9 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
 	}
     }, {EventId::pointer_click});
 
-    m_camera->on_error([this]()
+    m_camera->on_error([this](const std::string&)
     {
+        cout << "camera error, hiding" << endl;
         m_camera->hide();
     });
 #endif
@@ -932,7 +934,7 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
     for (auto& name : names)
     {
         grid->add(expand(make_shared<ImageLabel>(Image("file:" + lowercase(name) + ".png"), name)));
-        auto time1 = std::make_shared<Scrollwheel>(times, false);
+        auto time1 = std::make_shared<Scrollwheel>(times);
         time1->orient(Orientation::horizontal);
         time1->image(Image("file:wheel_down.png"),  Image("file:wheel_up.png"));
         grid->add(expand(time1));
@@ -948,7 +950,7 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
         time_invoke();
         m_enabled->on_checked_changed([time_invoke]() { time_invoke(); });
 
-        auto temp1 = std::make_shared<Scrollwheel>(temps, false);
+        auto temp1 = std::make_shared<Scrollwheel>(temps);
         temp1->orient(Orientation::horizontal);
         temp1->image(Image("file:wheel_down.png"),  Image("file:wheel_up.png"));
         grid->add(expand(temp1));

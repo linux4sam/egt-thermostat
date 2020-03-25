@@ -12,7 +12,7 @@
 #include "logic.h"
 #include <vector>
 
-struct Settings : private egt::detail::NonCopyable<Settings>
+struct Settings
 {
     /// this does not currently support nesting of transactions
     struct AutoTransaction

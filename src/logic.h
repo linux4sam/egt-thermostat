@@ -6,7 +6,6 @@
 #ifndef LOGIC_H
 #define LOGIC_H
 
-#include <egt/detail/signal.h>
 #include <egt/ui>
 #include <string>
 
@@ -36,7 +35,7 @@ public:
 
 
     /// @note Do not start a settings transaction on callback, one is already started.
-    egt::detail::Signal<> on_change;
+    egt::Signal<> on_change;
 
     Logic();
 

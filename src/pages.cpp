@@ -700,7 +700,7 @@ MenuPage::MenuPage(ThermostatWindow& window, Logic& logic)
 {
     auto layout = create_layout(_("Menu"));
 
-    auto grid = make_shared<StaticGrid>(std::make_tuple(4, 2));
+    auto grid = make_shared<StaticGrid>(StaticGrid::GridSize(4, 2));
     grid->border(40);
     layout->add(expand(grid));
 
@@ -903,7 +903,7 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
     form->name_align(AlignFlag::center);
     form->add_option(_("Schedule Enabled"), m_enabled);
 
-    auto grid = make_shared<StaticGrid>(std::make_tuple(3, 4));
+    auto grid = make_shared<StaticGrid>(StaticGrid::GridSize(3, 4));
     layout->add(expand(grid));
 
     vector<string> times;
@@ -936,7 +936,8 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
         grid->add(expand(make_shared<ImageLabel>(Image("file:" + lowercase(name) + ".png"), name)));
         auto time1 = std::make_shared<Scrollwheel>(times);
         time1->orient(Orientation::horizontal);
-        time1->image(Image("file:wheel_down.png"),  Image("file:wheel_up.png"));
+        time1->image_down(Image("file:wheel_down.png"));
+        time1->image_up(Image("file:wheel_up.png"));
         grid->add(expand(time1));
 
         std::weak_ptr<Scrollwheel> weak_time1(time1);
@@ -952,7 +953,8 @@ SchedulePage::SchedulePage(ThermostatWindow& window, Logic& logic)
 
         auto temp1 = std::make_shared<Scrollwheel>(temps);
         temp1->orient(Orientation::horizontal);
-        temp1->image(Image("file:wheel_down.png"),  Image("file:wheel_up.png"));
+        temp1->image_down(Image("file:wheel_down.png"));
+        temp1->image_up(Image("file:wheel_up.png"));
         grid->add(expand(temp1));
 
         std::weak_ptr<Scrollwheel> weak_temp1(temp1);

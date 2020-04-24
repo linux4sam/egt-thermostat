@@ -92,6 +92,30 @@ AC_CACHE_CHECK([for supported warning flags], egt_cv_warn_cflags, [
 WARN_CFLAGS="$egt_cv_warn_cflags"
 AC_SUBST(WARN_CFLAGS)
 
+AC_DEFUN([LIBINTL_SRC], [
+AC_LANG_PROGRAM([[
+#include <libintl.h>
+]],[[
+char *msg = gettext("test");
+]])])
+
+AC_MSG_CHECKING([if libc contains libintl])
+AC_LINK_IFELSE([LIBINTL_SRC],
+	[AC_MSG_RESULT([yes])
+	LIBC_CONTAINS_LIBINTL=Yes],
+	[AC_MSG_RESULT([no])
+	LIBC_CONTAINS_LIBINTL=])
+AC_SUBST([LIBC_CONTAINS_LIBINTL])
+
+AC_CHECK_HEADER([libintl.h],
+[NO_GETTEXT=],
+[NO_GETTEXT=Yes])
+AC_SUBST([NO_GETTEXT])
+
+if test -z "$NO_GETTEXT"; then
+    test -n "$LIBC_CONTAINS_LIBINTL" || LIBS="$LIBS -lintl"
+fi
+
 PKG_CHECK_MODULES(LIBEGT, [libegt], [], [
    AC_MSG_ERROR(libegt not found.  This is required.)
 ])

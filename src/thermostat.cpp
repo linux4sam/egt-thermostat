@@ -141,6 +141,7 @@ int main(int argc, char** argv)
     {
         win.m_logic.change_current(get_temp_sensor(settings().get("temp_sensor")));
     });
+    sensor_timer.start();
 
     auto ret = app.run();
 

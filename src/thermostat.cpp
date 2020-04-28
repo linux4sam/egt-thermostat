@@ -113,6 +113,8 @@ int main(int argc, char** argv)
             return "20";
         else if (key == "target_temp")
             return "20";
+        else if (key == "degrees")
+            return "f";
 
         return std::string();
     });

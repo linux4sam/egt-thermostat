@@ -8,6 +8,8 @@
 #endif
 
 #include "sensors.h"
+#include <egt/detail/math.h>
+#include <egt/geometry.h>
 #include <iostream>
 
 #ifdef HAVE_SENSORS
@@ -93,13 +95,18 @@ double get_temp_sensor(const std::string& name)
 {
     init_sensors();
 
-    double res = 0.;
-
     if (name == "fake")
     {
-        res = 22.;
-        return res;
+        // Using an ellipse, increment the angle to find a point on the ellipse
+        // and then use the y coordinate as the temp. This gives some fake temp
+        // data that almost makes sense as we circle around the ellipse.
+        static unsigned int angle = 0;
+        egt::EllipseType<float> e(egt::PointType<float>(0.f, 20.f), 10.f, 3.f);
+        auto point = e.point_on_circumference(static_cast<float>(egt::detail::to_radians<float>(0,angle++)));
+        return point.y();
     }
+
+    double res = 0.;
 
 #ifdef HAVE_SENSORS
     sensors_chip_name const* cn;

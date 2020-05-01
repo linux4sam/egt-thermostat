@@ -132,5 +132,14 @@ AS_IF([test "x$with_sensors" != "xno"],[
 ])
 AM_CONDITIONAL([HAVE_SENSORS], [test "x${have_sensors}" = xyes])
 
+AC_ARG_ENABLE([lto],
+  [AS_HELP_STRING([--enable-lto], [enable gcc's LTO [default=no]])],
+  [enable_lto=$enableval], [enable_lto=no])
+if test "x$enable_lto" = "xyes" ; then
+  AC_MSG_NOTICE([enabling LTO])
+  CFLAGS="$CFLAGS -flto"
+  CXXFLAGS="$CXXFLAGS -flto"
+fi
+
 AC_CONFIG_FILES([Makefile external/Makefile])
 AC_OUTPUT

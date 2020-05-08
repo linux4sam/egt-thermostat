@@ -1032,11 +1032,10 @@ AboutPage::AboutPage(ThermostatWindow& window, Logic& logic)
                     " - Configure screen brightness in and out of idle mode.\n"
                     " - Configurable home screen including background image.\n"
                     "\n"
-                    "Source code available at: https://github.com/linux4sam/egt-thermostat\n"
-                );
+                    "Source code available at: https://github.com/linux4sam/egt-thermostat\n",
+                    TextBox::TextFlags({TextBox::TextFlag::multiline, TextBox::TextFlag::word_wrap}));
     text->readonly(true);
     text->margin(20);
-    text->text_flags().set({TextBox::TextFlag::multiline, TextBox::TextFlag::word_wrap});
     text->border(0);
     text->color(Palette::ColorId::text, Palette::white);
     text->color(Palette::ColorId::bg, Palette::transparent);

@@ -116,6 +116,8 @@ void IdlePage::enter()
     if (settings().get("outside") == "on")
     {
         m_otemp->text(std::string(_("Outside")) + " " + format_temp(30));
+        if (m_otemp->min_size_hint().width() > m_otemp->width())
+            m_otemp->resize(m_otemp->min_size_hint());
         m_otemp->show();
     }
     else
@@ -418,6 +420,8 @@ void MainPage::enter()
     if (settings().get("outside") == "on")
     {
         m_otemp->text(std::string(_("Outside")) + " " + format_temp(30));
+        if (m_otemp->min_size_hint().width() > m_otemp->width())
+            m_otemp->resize(m_otemp->min_size_hint());
         m_otemp->show();
     }
     else
@@ -701,7 +705,9 @@ MenuPage::MenuPage(ThermostatWindow& window, Logic& logic)
     auto layout = create_layout(_("Menu"));
 
     auto grid = make_shared<StaticGrid>(StaticGrid::GridSize(4, 2));
-    grid->border(40);
+    grid->margin(40);
+    grid->horizontal_space(40);
+    grid->vertical_space(40);
     layout->add(expand(grid));
 
     auto time = make_setup_button<ImageButton>(Image("file:schedule.png"), _("Schedule"));

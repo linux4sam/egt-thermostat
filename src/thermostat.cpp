@@ -52,10 +52,18 @@ static void update_time(ThermostatWindow& win)
 
     auto l3 = win.find_child<Label>("time_label1");
     if (l3)
+    {
         l3->text(current_time());
+        if (l3->min_size_hint().width() > l3->width())
+            l3->resize(l3->min_size_hint());
+    }
     auto l4 = win.find_child<Label>("time_label2");
     if (l4)
+    {
         l4->text(current_time());
+        if (l4->min_size_hint().width() > l4->width())
+            l4->resize(l4->min_size_hint());
+    }
 }
 
 int main(int argc, char** argv)

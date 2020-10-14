@@ -353,7 +353,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     shrink_camera();
     add(m_camera);
 
-    m_camera->on_click([this]()
+    m_camera->on_event([this](Event & event)
     {
         if (!m_camera_fullscreen)
         {
@@ -361,11 +361,11 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
             m_camera->scale(2.5, 2.5);
             m_camera_fullscreen = true;
         }
-        else
-        {
-            shrink_camera();
-        }
-    });
+	else
+	{
+	    shrink_camera();
+	}
+    }, {EventId::pointer_click});
 
     m_camera->on_error([this](const std::string&)
     {

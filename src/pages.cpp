@@ -353,6 +353,13 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     shrink_camera();
     add(m_camera);
 
+    /**
+     * If the camera window is a plane window and camera window scaled
+     * to fullscreen, libegt does not receive touch events when
+     * touched outside of original camera window box. So disabling
+     * scaling of camerawindow till this gets fixed in libegt.
+     */
+#if 0
     m_camera->on_event([this](Event & event)
     {
         if (!m_camera_fullscreen)
@@ -366,6 +373,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
 	    shrink_camera();
 	}
     }, {EventId::pointer_click});
+#endif
 
     m_camera->on_error([this](const std::string&)
     {

@@ -1032,7 +1032,7 @@ AboutPage::AboutPage(ThermostatWindow& window, Logic& logic)
                     "Features:\n"
                     " - SQLite database for all settings and temp logging.\n"
                     " - lm-sensors support for enumerating and using any sensor.\n"
-                    " - Live camera feed.\n"
+                    " - Live camera feed with full screen scaling.\n"
                     " - Configure Fahrenheit or Celsius display.\n"
                     " - Configurable idle screen.\n"
                     " - Configure screen brightness in and out of idle mode.\n"

@@ -38,7 +38,8 @@ void Logic::change_target(float value)
     {
         Settings::AutoTransaction tx(settings());
 
-        settings().set("target_temp", std::to_string(m_target));
+        if (settings().get("sql_logs") == "on")
+            settings().set("target_temp", std::to_string(m_target));
 
         process();
         on_logic_change.invoke();

@@ -134,6 +134,7 @@ struct HomeContentPage : public SettingsPage
     std::shared_ptr<egt::ToggleBox> m_usebackground;
     std::shared_ptr<egt::ToggleBox> m_showoutside;
     std::shared_ptr<egt::ToggleBox> m_time_format;
+    std::shared_ptr<egt::ToggleBox> m_sql_logs;
 };
 
 struct SensorsPage : public SettingsPage

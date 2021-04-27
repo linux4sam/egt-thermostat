@@ -816,6 +816,13 @@ HomeContentPage::HomeContentPage(ThermostatWindow& window, Logic& logic)
     m_time_format->checked(settings().get("time_format") == "24");
     form->add_option(_("Time format"), m_time_format);
 
+    m_sql_logs = make_shared<ToggleBox>();
+    m_sql_logs->border_radius(4.0);
+    m_sql_logs->toggle_text(_("Off"), _("On"));
+    m_sql_logs->enable_disable(false);
+    m_sql_logs->checked(settings().get("sql_logs") == "on");
+    form->add_option(_("SQL logs (temperature and status)"), m_sql_logs);
+
 #if 0
     std::vector<std::string> timezones;
     get_timezones(timezones);
@@ -853,6 +860,11 @@ bool HomeContentPage::leave()
         settings().set("time_format", "24");
     else
         settings().set("time_format", "12");
+
+    if (m_sql_logs->checked())
+        settings().set("sql_logs", "on");
+    else
+        settings().set("sql_logs", "off");
 
     // hack
     m_logic.refresh();

@@ -73,12 +73,14 @@ ThermostatWindow::ThermostatWindow()
 
     m_logic.on_logic_change([this]()
     {
-        settings().status_log(m_logic.current_status(), m_logic.current_fan_status());
+        if (settings().get("sql_logs") == "on")
+            settings().status_log(m_logic.current_status(), m_logic.current_fan_status());
     });
 
     m_logic.on_temperature_change([this]()
     {
-        settings().temp_log(m_logic.current());
+        if (settings().get("sql_logs") == "on")
+            settings().temp_log(m_logic.current());
     });
 }
 

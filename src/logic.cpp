@@ -41,7 +41,7 @@ void Logic::change_target(float value)
         settings().set("target_temp", std::to_string(m_target));
 
         process();
-        on_change.invoke();
+        on_logic_change.invoke();
     }
 }
 
@@ -52,7 +52,7 @@ void Logic::change_current(float value)
         Settings::AutoTransaction tx(settings());
 
         process();
-        on_change.invoke();
+        on_temperature_change.invoke();
     }
 }
 
@@ -101,7 +101,7 @@ void Logic::set_mode(mode m)
     if (egt::detail::change_if_diff<>(m_mode, m))
     {
         process();
-        on_change.invoke();
+        on_logic_change.invoke();
     }
 }
 
@@ -110,7 +110,7 @@ void Logic::set_fan_mode(fanmode m)
     if (egt::detail::change_if_diff<>(m_fan_mode, m))
     {
         process();
-        on_change.invoke();
+        on_logic_change.invoke();
     }
 }
 
@@ -134,11 +134,11 @@ void Logic::change_status(status s, bool fan)
 
     if (f1 || s1)
     {
-        on_change.invoke();
+        on_logic_change.invoke();
     }
 }
 
 void Logic::refresh()
 {
-    on_change.invoke();
+    on_logic_change.invoke();
 }

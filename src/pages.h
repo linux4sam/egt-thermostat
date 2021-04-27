@@ -33,6 +33,7 @@ struct IdlePage : public ThermostatPage
     virtual void enter() override;
 
     void apply_logic_change(Logic::status status);
+    void apply_temperature_change();
 
     std::shared_ptr<egt::Label> m_temp;
     std::shared_ptr<egt::Label> m_status;
@@ -48,6 +49,7 @@ struct MainPage : public ThermostatPage
     virtual void shrink_camera() override;
 
     void apply_logic_change(Logic::status status);
+    void apply_temperature_change();
 
     std::shared_ptr<egt::ImageButton> m_menu;
     std::shared_ptr<egt::Label> m_temp;

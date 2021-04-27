@@ -71,9 +71,13 @@ ThermostatWindow::ThermostatWindow()
         EventId::pointer_hold
        });
 
-    m_logic.on_change([this]()
+    m_logic.on_logic_change([this]()
     {
         settings().status_log(m_logic.current_status(), m_logic.current_fan_status());
+    });
+
+    m_logic.on_temperature_change([this]()
+    {
         settings().temp_log(m_logic.current());
     });
 }

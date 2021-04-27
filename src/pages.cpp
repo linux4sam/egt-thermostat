@@ -105,9 +105,15 @@ IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
     hsizer->add(m_status);
 
     apply_logic_change(m_logic.current_status());
-    logic.on_change([this]()
+    logic.on_logic_change([this]()
     {
         apply_logic_change(m_logic.current_status());
+    });
+
+    apply_temperature_change();
+    logic.on_temperature_change([this]()
+    {
+        apply_temperature_change();
     });
 }
 
@@ -126,10 +132,13 @@ void IdlePage::enter()
     }
 }
 
-void IdlePage::apply_logic_change(Logic::status status)
+void IdlePage::apply_temperature_change()
 {
     m_temp->text(format_temp(m_logic.current()));
+}
 
+void IdlePage::apply_logic_change(Logic::status status)
+{
     switch (status)
     {
     case Logic::status::off:
@@ -308,9 +317,15 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     });
 
     apply_logic_change(m_logic.current_status());
-    logic.on_change([this]()
+    logic.on_logic_change([this]()
     {
         apply_logic_change(m_logic.current_status());
+    });
+
+    apply_temperature_change();
+    logic.on_temperature_change([this]()
+    {
+        apply_temperature_change();
     });
 
     auto sizer = make_shared<HorizontalBoxSizer>();
@@ -457,10 +472,13 @@ bool MainPage::leave()
     return true;
 }
 
-void MainPage::apply_logic_change(Logic::status status)
+void MainPage::apply_temperature_change()
 {
     m_temp->text(format_temp(m_logic.current()));
+}
 
+void MainPage::apply_logic_change(Logic::status status)
+{
     switch (status)
     {
     case Logic::status::off:

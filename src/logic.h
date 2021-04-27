@@ -35,7 +35,9 @@ public:
 
 
     /// @note Do not start a settings transaction on callback, one is already started.
-    egt::Signal<> on_change;
+    egt::Signal<> on_logic_change;
+
+    egt::Signal<> on_temperature_change;
 
     Logic();
 

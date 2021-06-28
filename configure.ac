@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([egt-thermostat],[1.2-rc1])
+AC_INIT([egt-thermostat],[1.2])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_MACRO_DIR([m4])
@@ -115,7 +115,7 @@ if test -z "$NO_GETTEXT"; then
     test -n "$LIBC_CONTAINS_LIBINTL" || LIBS="$LIBS -lintl"
 fi
 
-PKG_CHECK_MODULES(LIBEGT, [libegt >= 1.2-rc1], [], [
+PKG_CHECK_MODULES(LIBEGT, [libegt >= 1.2], [], [
    AC_MSG_ERROR(libegt not found.  This is required.)
 ])
 

@@ -329,6 +329,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     });
 
     auto sizer = make_shared<HorizontalBoxSizer>();
+    sizer->height(50);
     add(expand_horizontal(bottom(sizer)));
 
     m_mode = make_shared<ImageButton>();

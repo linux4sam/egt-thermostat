@@ -32,17 +32,33 @@ Also, install some thermostat dependencies.
 sudo apt install sqlite3
 ```
 
-Compile and install libegt to a directory. We'll assume it's installed to
-/opt/egt. Then, configure and build this project.
+Compile and install libegt to a directory. Then, configure
 
 ```sh
 git clone --recursive https://github.com/linux4sam/egt-thermostat.git
 cd egt-thermostat
 ./autogen.sh
+```
+
+Depending on your egt path the next step could be:
+```sh
 CXXFLAGS="-I/opt/egt/include/" \
 LDFLAGS="-L/opt/egt/lib/" \
 PKG_CONFIG_PATH=/opt/egt/lib/pkgconfig \
 ./configure
+```
+
+**or**
+
+```sh
+CXXFLAGS="-I/usr/local/include/" \
+LDFLAGS="-L/usr/local/lib/" \
+PKG_CONFIG_PATH=/usr/local/lib/pkgconfig \
+./configure
+```
+
+& then build this project
+```sh
 make
 ```
 
@@ -55,7 +71,7 @@ sqlite3 thermostat.db < thermostat.sql
 Then, run.
 
 ```sh
-./thermostat
+./egt-thermostat
 ```
 
 ## License

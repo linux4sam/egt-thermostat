@@ -333,6 +333,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     add(expand_horizontal(bottom(sizer)));
 
     m_mode = make_shared<ImageButton>();
+    m_mode->show_label(true);
     m_mode->padding(10);
     m_mode->fill_flags(Theme::FillFlag::blend);
     m_mode->image_align(AlignFlag::center | AlignFlag::left);
@@ -352,6 +353,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     sizer->add(expand_vertical(line));
 
     m_fan = make_shared<ImageButton>();
+    m_fan->show_label(true);
     m_fan->padding(10);
     m_fan->fill_flags(Theme::FillFlag::blend);
     m_fan->image_align(AlignFlag::center | AlignFlag::left);

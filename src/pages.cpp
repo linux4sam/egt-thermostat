@@ -47,7 +47,7 @@ static void selectable_btn_setup(const shared_ptr<ImageButton>& button)
     button->border(2);
     button->margin(5);
     button->padding(10);
-    button->image_align(AlignFlag::center | AlignFlag::top);
+    button->image_align(AlignFlag::center_horizontal | AlignFlag::top);
 
     std::weak_ptr<ImageButton> weak_button(button);
     button->on_click([weak_button](Event&)
@@ -66,13 +66,13 @@ IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
     auto date = make_shared<Label>("",
                                    AlignFlag::center);
     date->color(Palette::ColorId::bg, Palette::transparent);
-    date->align(AlignFlag::center | AlignFlag::top);
+    date->align(AlignFlag::center_horizontal | AlignFlag::top);
     date->margin(10);
     date->name("date_label1");
     add(date);
 
     auto leftbox = make_shared<BoxSizer>(Orientation::vertical);
-    leftbox->align(AlignFlag::center | AlignFlag::left);
+    leftbox->align(AlignFlag::center_vertical | AlignFlag::left);
     leftbox->margin(10);
     add(leftbox);
 
@@ -82,12 +82,12 @@ IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
 
     m_otemp = make_shared<ImageLabel>(Image("file:02d.png"), "Outside");
     m_otemp->font(Font(16));
-    m_otemp->image_align(AlignFlag::center | AlignFlag::top);
+    m_otemp->image_align(AlignFlag::center_horizontal | AlignFlag::top);
     leftbox->add(egt::center(m_otemp));
 
     auto logo = std::make_shared<ImageButton>(Image("icon:egt_logo_white.png;128"));
     logo->fill_flags().clear();
-    logo->align(AlignFlag::center | AlignFlag::bottom);
+    logo->align(AlignFlag::center_horizontal | AlignFlag::bottom);
     logo->margin(10);
     add(logo);
 
@@ -209,13 +209,13 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     auto date = make_shared<Label>("",
                                    AlignFlag::center);
     date->color(Palette::ColorId::bg, Palette::transparent);
-    date->align(AlignFlag::center | AlignFlag::top);
+    date->align(AlignFlag::center_horizontal | AlignFlag::top);
     date->margin(10);
     date->name("date_label2");
     add(date);
 
     auto leftbox = make_shared<BoxSizer>(Orientation::vertical);
-    leftbox->align(AlignFlag::center | AlignFlag::left);
+    leftbox->align(AlignFlag::center_vertical | AlignFlag::left);
     leftbox->margin(10);
     add(leftbox);
 
@@ -225,7 +225,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
 
     m_otemp = make_shared<ImageLabel>(Image("file:02d.png"), "Outside");
     m_otemp->font(Font(16));
-    m_otemp->image_align(AlignFlag::center | AlignFlag::top);
+    m_otemp->image_align(AlignFlag::center_horizontal | AlignFlag::top);
     leftbox->add(egt::center(m_otemp));
 
     auto hsizer = make_shared<BoxSizer>(Orientation::vertical);
@@ -242,7 +242,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     hsizer->add(m_status);
 
     m_layout = make_shared<VerticalBoxSizer>(Justification::justify);
-    m_layout->align(AlignFlag::right | AlignFlag::center);
+    m_layout->align(AlignFlag::right | AlignFlag::center_vertical);
     m_layout->margin(50);
     add(m_layout);
 
@@ -336,7 +336,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     m_mode->show_label(true);
     m_mode->padding(10);
     m_mode->fill_flags(Theme::FillFlag::blend);
-    m_mode->image_align(AlignFlag::center | AlignFlag::left);
+    m_mode->image_align(AlignFlag::center_vertical | AlignFlag::left);
     m_mode->color(Palette::ColorId::button_bg, Color(255, 255, 255, 75));
     m_mode->color(Palette::ColorId::button_bg, Color(Palette::cyan, 75), Palette::GroupId::active);
     sizer->add(expand(m_mode));
@@ -356,7 +356,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     m_fan->show_label(true);
     m_fan->padding(10);
     m_fan->fill_flags(Theme::FillFlag::blend);
-    m_fan->image_align(AlignFlag::center | AlignFlag::left);
+    m_fan->image_align(AlignFlag::center_vertical | AlignFlag::left);
     m_fan->color(Palette::ColorId::button_bg, Color(255, 255, 255, 75));
     m_fan->color(Palette::ColorId::button_bg, Color(Palette::cyan, 75), Palette::GroupId::active);
     sizer->add(expand(m_fan));

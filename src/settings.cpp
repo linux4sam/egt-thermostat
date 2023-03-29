@@ -8,8 +8,8 @@
 #include <sqlite3pp.h>
 #include <string>
 
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+#include <filesystem>
+namespace fs = std::filesystem;
 
 static inline const char* db_path()
 {

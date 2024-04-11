@@ -3,14 +3,18 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+#include "config.h"
 #include "settings.h"
 #include <map>
+#if ENABLE_DATABASE
 #include <sqlite3pp.h>
+#endif
 #include <string>
 
 #include <filesystem>
 namespace fs = std::filesystem;
 
+#if ENABLE_DATABASE
 static inline const char* db_path()
 {
     auto install_path = DATADIR "/egt/thermostat/thermostat.db";
@@ -18,22 +22,27 @@ static inline const char* db_path()
         return install_path;
     return "thermostat.db";
 }
+#endif
 
 struct Settings::settings_impl
 {
     std::map<std::string, std::string> cache;
+#if ENABLE_DATABASE
     sqlite3pp::database db{db_path()};
     sqlite3pp::query config_qry{db,
                   "SELECT value FROM config WHERE key=:key LIMIT 1"};
     sqlite3pp::command config_cmd{db,
                   "REPLACE INTO config (key,value) VALUES (:key,:value)"};
+#endif
 };
 
 Settings::Settings()
     : m_impl(new settings_impl)
 {
+#if ENABLE_DATABASE
     // store temp tables in memory
     m_impl->db.execute("PRAGMA temp_store = MEMORY");
+#endif
 }
 
 void Settings::set_default_callback(default_value_callback_t callback)
@@ -45,10 +54,12 @@ void Settings::set(const std::string& key, const std::string& value)
 {
     m_impl->cache[key] = value;
 
+#if ENABLE_DATABASE
     m_impl->config_cmd.reset();
     m_impl->config_cmd.bind(":key", key, sqlite3pp::nocopy);
     m_impl->config_cmd.bind(":value", value, sqlite3pp::nocopy);
     m_impl->config_cmd.execute();
+#endif
 }
 
 std::string Settings::get(const std::string& key)
@@ -57,6 +68,7 @@ std::string Settings::get(const std::string& key)
     if (c != m_impl->cache.end())
         return c->second;
 
+#if ENABLE_DATABASE
     m_impl->config_qry.reset();
     m_impl->config_qry.bind(":key", key, sqlite3pp::nocopy);
 
@@ -71,6 +83,7 @@ std::string Settings::get(const std::string& key)
             return v;
         }
     }
+#endif
 
     if (m_default_callback)
     {
@@ -83,16 +96,19 @@ std::string Settings::get(const std::string& key)
 
 void Settings::temp_log(float temp)
 {
+#if ENABLE_DATABASE
     sqlite3pp::command cmd(m_impl->db,
                            "INSERT INTO temp_log (temp, datetime) VALUES (:temp, :datetime)");
     cmd.bind(":temp", temp);
     long long int since_epoch = std::chrono::steady_clock::now().time_since_epoch().count();
     cmd.bind(":datetime", since_epoch);
     cmd.execute();
+#endif
 }
 
 void Settings::status_log(Logic::status status, bool fan)
 {
+#if ENABLE_DATABASE
     sqlite3pp::command cmd(m_impl->db,
                            "INSERT INTO status_log (status, fan, datetime) VALUES (:status, :fan, :datetime)");
     cmd.bind(":status", static_cast<int>(status));
@@ -100,16 +116,21 @@ void Settings::status_log(Logic::status status, bool fan)
     long long int since_epoch = std::chrono::steady_clock::now().time_since_epoch().count();
     cmd.bind(":datetime", since_epoch);
     cmd.execute();
+#endif
 }
 
 void Settings::begin_tx()
 {
+#if ENABLE_DATABASE
     m_impl->db.execute("BEGIN");
+#endif
 }
 
 void Settings::end_tx()
 {
+#if ENABLE_DATABASE
     m_impl->db.execute("COMMIT");
+#endif
 }
 
 Settings& settings()

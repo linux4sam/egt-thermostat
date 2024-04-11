@@ -140,5 +140,15 @@ if test "x$enable_lto" = "xyes" ; then
   CXXFLAGS="$CXXFLAGS -flto"
 fi
 
-AC_CONFIG_FILES([Makefile external/Makefile])
+AC_ARG_ENABLE([database],
+  [AS_HELP_STRING([--enable-database], [enable the database to store data and settings [default=no]])],
+  [enable_database=$enableval], [enable_database=no])
+AM_CONDITIONAL([ENABLE_DATABASE], [test "x${enable_database}" = xyes])
+if test "x$enable_database" = "xyes" ; then
+  AC_MSG_NOTICE([enabling database])
+  AC_DEFINE(ENABLE_DATABASE, 1, [Enable database])
+  AC_CONFIG_FILES([external/Makefile])
+fi
+
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

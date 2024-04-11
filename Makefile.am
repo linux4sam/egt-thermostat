@@ -1,14 +1,19 @@
+if ENABLE_DATABASE
 SUBDIRS = external
 
 AUTOMAKE_OPTIONS = subdir-objects
+endif
 
 CUSTOM_CXXFLAGS = $(WARN_CFLAGS) \
 	-I$(top_srcdir)/src \
-	-isystem $(top_srcdir)/external/sqlite3 \
-	-isystem $(top_srcdir)/external/sqlite3pp/headeronly_src \
 	$(LIBEGT_CFLAGS)
+CUSTOM_LDADD = $(LIBEGT_LIBS)
 
-CUSTOM_LDADD = $(LIBEGT_LIBS) $(top_builddir)/external/libsqlite3.la
+if ENABLE_DATABASE
+CUSTOM_CXXFLAGS += -isystem $(top_srcdir)/external/sqlite3 \
+	-isystem $(top_srcdir)/external/sqlite3pp/headeronly_src
+CUSTOM_LDADD += $(top_builddir)/external/libsqlite3.la
+endif
 
 AM_CXXFLAGS = -DDATADIR=\"$(datadir)\"
 

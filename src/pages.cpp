@@ -85,7 +85,7 @@ IdlePage::IdlePage(ThermostatWindow& window, Logic& logic)
     m_otemp->image_align(AlignFlag::center_horizontal | AlignFlag::top);
     leftbox->add(egt::center(m_otemp));
 
-    auto logo = std::make_shared<ImageButton>(Image("icon:egt_logo_white.png;128"));
+    auto logo = std::make_shared<ImageButton>(Image("icon:mgs_logo_white.png;128"));
     logo->fill_flags().clear();
     logo->align(AlignFlag::center_horizontal | AlignFlag::bottom);
     logo->margin(10);
@@ -1048,7 +1048,7 @@ AboutPage::AboutPage(ThermostatWindow& window, Logic& logic)
     auto sizer = make_shared<HorizontalBoxSizer>();
     layout->add(egt::center(sizer));
 
-    auto logo = std::make_shared<ImageButton>(Image("icon:egt_logo_white.png;128"));
+    auto logo = std::make_shared<ImageButton>(Image("icon:mgs_logo_white.png;128"));
     logo->fill_flags().clear();
     logo->margin(10);
     sizer->add(logo);

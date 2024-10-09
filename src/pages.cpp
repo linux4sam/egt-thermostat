@@ -457,7 +457,7 @@ void MainPage::enter()
     m_fan->image(Image("file:fan_" + fan + ".png", 0.3));
 
 #ifdef EGT_HAS_CAMERA
-    if (m_camera->start())
+    if (m_camera->play())
         m_camera->show();
 #endif
 

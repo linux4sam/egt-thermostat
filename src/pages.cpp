@@ -368,15 +368,17 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
 
 #ifdef EGT_HAS_CAMERA
     m_camera = make_shared<CameraWindow>(Size(160, 120));
+    const auto wscale = static_cast<float>((egt::Application::instance().screen()->size().width()) / m_camera->width());
+    const auto hscale = static_cast<float>((egt::Application::instance().screen()->size().height()) / m_camera->height());
     shrink_camera();
     add(m_camera);
 
-    m_camera->on_event([this](Event & event)
+    m_camera->on_event([this, wscale, hscale](Event & event)
     {
         if (!m_camera_fullscreen)
         {
             m_camera->move(Point(0, 0));
-            m_camera->scale(2.5, 2.5);
+            m_camera->scale(wscale, hscale);
             m_camera_fullscreen = true;
         }
 	else

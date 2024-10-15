@@ -367,7 +367,7 @@ MainPage::MainPage(ThermostatWindow& window, Logic& logic)
     });
 
 #ifdef EGT_HAS_CAMERA
-    m_camera = make_shared<CameraWindow>(Size(320, 240));
+    m_camera = make_shared<CameraWindow>(Size(160, 120));
     shrink_camera();
     add(m_camera);
 
@@ -413,7 +413,7 @@ void MainPage::shrink_camera()
     if (m_camera_fullscreen)
     {
 #ifdef EGT_HAS_CAMERA
-	m_camera->scale(.5, .5);
+	m_camera->scale(1, 1);
 	m_camera->move(Point(m_menu->width() + 10, 10));
 #endif
         m_camera_fullscreen = false;

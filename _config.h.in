@@ -1,0 +1,5 @@
+/* Enable database */
+#cmakedefine ENABLE_DATABASE @ENABLE_DATABASE@
+
+/* Have sensors support */
+#cmakedefine HAVE_SENSORS @HAVE_SENSORS@

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(
     egt-thermostat
-    VERSION 1.8
+    VERSION 1.8.1
     DESCRIPTION "A thermostat application built upon the EGT library."
     LANGUAGES C;CXX
 )
